@@ -1,0 +1,14 @@
+{{< core/modal }}
+    {{$title}}{{#str}} title_modal_video, mod_lanebs {{/str}}{{/title}}
+    {{$body}}
+        <div class="container content" data-id="" data-action="video_content_block" style="height:100%">
+            <div class="item-container tocs" id="data-toc"></div>
+        </div>
+    {{/body}}
+    {{$footer}}
+        <div style="flex:auto">
+            <button type="button" class="btn btn-primary" style="color:white;background-color:#174c8d;border-color:#4285f4;" data-action="submit_button">{{#str}} submit_button, mod_lanebs {{/str}}</button>
+        </div>
+        <button type="button" class="btn btn-secondary" style="color:#174c8d;background-color:white;border-color:#4285f4;" data-action="cancel_button">{{#str}} cancel_str, mod_lanebs {{/str}}</button>
+    {{/footer}}
+{{/ core/modal }}
