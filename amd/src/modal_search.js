@@ -260,7 +260,7 @@ define([
                 page: page
             };
             ModalSearch.prototype.getAjaxCall('mod_lanebs_toc_name', args, function (response) {
-                let tocName = response.body;
+                let tocName = response;
                 if (tocName !== undefined) {
                     let name = $(OUTER_SELECTORS.NAME_FIELD).val();
                     let pg = ModalSearch.prototype.strings['lanebs_read_pg'];
