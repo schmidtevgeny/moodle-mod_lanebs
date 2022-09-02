@@ -261,10 +261,10 @@ define([
             };
             ModalSearch.prototype.getAjaxCall('mod_lanebs_toc_name', args, function (response) {
                 let tocName = response;
-                if (tocName !== undefined) {
+                if (tocName !== undefined && page !== '1') {
                     let name = $(OUTER_SELECTORS.NAME_FIELD).val();
                     let pg = ModalSearch.prototype.strings['lanebs_read_pg'];
-                    let regexp = '/, ' + pg + '.+/';
+                    let regexp = new RegExp(', ' + pg + '.+', 'gi');
                     $(OUTER_SELECTORS.NAME_FIELD).val(name.replace(regexp, '') + ', ' + pg + '.' + page + ', ' + tocName);
                 }
             });
