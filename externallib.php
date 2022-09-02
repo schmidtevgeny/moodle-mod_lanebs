@@ -344,8 +344,22 @@ class mod_lanebs_external extends external_api
         $items = json_decode($data);
         $tocName = array();
         if ($page !== 0) {
-            foreach ($items->body->items as $item) {
-                if ($page <= (int)$item->page) {
+            $tocs = $items->body->items;
+            usort($tocs, function ($toc1, $toc2) {
+                return $toc1->page <=> $toc2->page;
+            });
+            foreach ($tocs as $tocId => $item) {
+                if ($page === (int)$item->page) {
+                    $tocName = $item->title;
+                    break;
+                }
+
+                if ($page > (int)$item->page && (isset($tocs[$tocId+1]) && ($tocs[$tocId+1]->page > $page))) {
+                    $tocName = $item->title;
+                    break;
+                }
+
+                if (!isset($tocs[$tocId+1])) {
                     $tocName = $item->title;
                     break;
                 }
