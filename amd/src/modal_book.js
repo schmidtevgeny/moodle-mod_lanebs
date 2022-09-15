@@ -72,7 +72,7 @@ define([
             }).
             done(function (response) {
                 let pageNumber = $(SELECTORS.CONTENT_BLOCK).attr('data-page');
-                ModalBook.prototype.getBookResult(response['body'], pageNumber);
+                ModalBook.prototype.getBookResult(response['body'], pageNumber, id);
             }).fail(function (response) {
                 console.log(response);
             });
@@ -99,21 +99,22 @@ define([
         }.bind(this));
     };
 
-    ModalBook.prototype.getBookResult = function (response, pageNumber) {
+    ModalBook.prototype.getBookResult = function (response, pageNumber, bookId) {
         let iframeBook = document.getElementById('book_iframe');
-        $(iframeBook).attr('src', '#');
-        iframeBook.contentWindow.document.open();
-        iframeBook.contentWindow.location.hash = '#' + pageNumber;
-        iframeBook.contentWindow.document.write(response);
-        iframeBook.contentWindow.document.close();
+        let readerUrl = 'https://reader.lanbook.com/book/'+bookId+'?jwtToken='+response+'&mode=moodlePlugin'+'#'+pageNumber;
+        $(iframeBook).attr('src', readerUrl);
+        //iframeBook.contentWindow.document.open();
+        //iframeBook.contentWindow.location.hash = '#' + pageNumber;
+        //iframeBook.contentWindow.document.write(response);
+        //iframeBook.contentWindow.document.close();
         // for change reader scale after loading
         // some kostil...
-        let timer = setInterval(function() {
+        /*let timer = setInterval(function() {
             if (iframeBook.contentWindow.Reader.Viewer.UIInputZoom !== undefined && iframeBook.contentWindow.Reader.Viewer.pageScale !== undefined) {
                 iframeBook.contentWindow.Reader.Viewer.pageScale(50 * 0.01);
                 clearInterval(timer);
             }
-        }, 1000);
+        }, 1000);*/
     };
 
     ModalRegistry.register(ModalBook.TYPE, ModalBook, 'mod_lanebs/modal_book');

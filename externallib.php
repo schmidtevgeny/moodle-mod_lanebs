@@ -36,7 +36,7 @@ class mod_lanebs_external extends external_api
     private static $authUrl = 'https://security.lanbook.com';//'https://security.test.lanbook.com';
     private static $baseUrl = 'https://moodle-api.e.lanbook.com';//'https://moodle-api.test.lanbook.com';
     private static $readerUrl = 'https://reader.lanbook.com';
-    private static $mobileReaderUrl = 'https://reader.lanbook.com/m';
+    private static $mobileReaderUrl = 'https://reader.lanbook.com';
     private const SORT_CREATE_DESC = 'create_time';
 
     /**
@@ -145,14 +145,14 @@ class mod_lanebs_external extends external_api
             ]
         );
         if ($mobile) {
-            $readerUrl = self::$mobileReaderUrl . '/book/'. $id . '?moodle=1';
+            $readerUrl = self::$mobileReaderUrl . '/old/book/'. $id . '?moodle=1';
         } else {
-            $readerUrl = self::$readerUrl . '/book/'. $id . '?moodle=1';
+            $readerUrl = self::$readerUrl . '/old/book/'. $id . '?moodle=1';
         }
-        $data = $curl->get($readerUrl, null, $options);
-        $result = self::regexReplace($data);
+        //$data = $curl->get($readerUrl, null, $options);
+        //$result = self::regexReplace($data);
         return array(
-            'body' => $result
+            'body' => self::$readerToken//$result
         );
     }
 
