@@ -62,6 +62,8 @@ if (isset($settings->token) && !empty($settings->token)) {
 else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
     $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
 }
+
+$PAGE->requires->css('/mod/lanebs/css/modal_book.css');
 $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
 
 $PAGE->requires->js_call_amd('mod_lanebs/view_button', 'init', array('title' => get_string('lanebs_view', 'mod_lanebs')));

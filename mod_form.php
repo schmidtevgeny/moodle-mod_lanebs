@@ -50,6 +50,7 @@ class mod_lanebs_mod_form extends moodleform_mod {
             $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
         }
         $PAGE->requires->css('/mod/lanebs/css/modal_video.css');
+        $PAGE->requires->css('/mod/lanebs/css/modal_book.css');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
 
