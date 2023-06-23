@@ -39,6 +39,7 @@ define(["exports", "jquery", "core/modal_factory", "core/str", "mod_lanebs/modal
                         $(modal.getRoot()).find('.modal-body').css('height', '770px');
                         $(modal.getRoot()).find('.modal-body').css('overflow-y', 'auto');
                         ModalSearch.prototype.getAjaxCall('mod_lanebs_auth', [], function (data) {
+                            //console.log(data);
                             if (data['error']['code'] === 403) {
                                 console.log(data);
                                 Str.get_string('lanebs_auth_error', 'mod_lanebs').then(function (str) {

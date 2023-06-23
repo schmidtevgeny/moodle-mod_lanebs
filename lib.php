@@ -110,8 +110,9 @@ function lanebs_delete_instance($id) {
  * @return cached_cm_info info
  */
 function lanebs_get_coursemodule_info($coursemodule) {
-    global $DB;
-
+    global $DB, $PAGE;
+    $code = '$(document).ready(function () {$(".modtype_lanebs").find("img.activityicon").closest("div").css("background-color", "#fff");})';
+    $PAGE->requires->js_amd_inline($code);
     if (!$lanebs = $DB->get_record('lanebs', array('id'=>$coursemodule->instance),
         'id, course, name, content, content_name, page_number, cover, videos')) {
         return NULL;

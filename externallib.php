@@ -245,7 +245,7 @@ class mod_lanebs_external extends external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt([ 'CURLOPT_HTTPHEADER' => ['x-auth-token-subscriber: '.self::$subscribeToken]]);
+        $curl->setopt(['CURLOPT_HTTPHEADER' => ['x-auth-token-subscriber: '.self::$subscribeToken]]);
         $data = $curl->get(self::$authUrl . '/api/sign_in/moodle', null, $options);
         $token = (json_decode($data))->jwt->access_token;
         if ($token) {

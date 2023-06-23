@@ -312,7 +312,7 @@ define([
                             '<button type="button" name="add_book" class="btn btn-sm ml-3" style="color: #174c8d;' +
                                     'background-color: white;border-color: #4285f4;">'+ModalSearch.prototype.strings['lanebs_add']+'</button>' +
                             '<button type="button" class="trigger_book btn btn-sm ml-3 float-right" style="color: #174c8d;' +
-                                    'background-color: white;border-color: #4285f4;">'+ModalSearch.prototype.strings['lanebs_preshow']+'</button>'+
+                                    'background-color: white;border-color: #4285f4;" data-page="'+ item.page_number +'">'+ModalSearch.prototype.strings['lanebs_preshow']+'</button>'+
                             '<br>' +
                         '</div>' +
                     '</div><hr style="margin-top:5px;">');
@@ -324,7 +324,8 @@ define([
         $(SELECTORS.CONTENT_BLOCK).attr('data-page', maxPage);
         $(SELECTORS.TRIGGER_BOOK).on('click', function (e) {
             let id = $(e.target).closest('.item').attr('data-id');
-            ModalBookHandler.init(e, id);
+            let pageNumber = $(SELECTORS.BOOK_FILTER).val() === 'toc' ? $(e.target).attr('data-page') : null;
+            ModalBookHandler.init(e, id, pageNumber);
         });
         $(SELECTORS.ADD_BOOK).on('click', function (e) {
             let id = $(e.target).closest('.item').attr('data-id');
@@ -347,9 +348,6 @@ define([
             ModalSearch.prototype.nameFieldFill();
             // clearing and updating video modal
             ModalVideo.prototype.resetModal();
-            /*if (ModalVideo.prototype.getIssetVideos()) {
-
-            }*/
         });
     };
 
