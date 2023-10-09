@@ -63,10 +63,12 @@ else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod
     $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
 }
 
-$PAGE->requires->css('/mod/lanebs/css/modal_book.css');
 $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
 
-$PAGE->requires->js_call_amd('mod_lanebs/view_button', 'init', array('title' => get_string('lanebs_view', 'mod_lanebs')));
+$PAGE->requires->css('/mod/lanebs/css/modal_book.css');
+$PAGE->requires->css('/mod/lanebs/css/lanebs_modal.css');
+
+$PAGE->requires->js_call_amd('mod_lanebs/view_button', 'init', array('id' => $moduleinstance->content, 'page' => $moduleinstance->page_number, 'type' => $moduleinstance->type));
 
 $PAGE->requires->js_call_amd('mod_lanebs/player_button', 'init');
 
@@ -79,7 +81,7 @@ $videos = $moduleinstance->videos;
 $videos = json_decode($videos);
 $videosBlock = '';
 if (!empty($videos)) {
-    $videosBlock = '<div class="row"><h3>'.get_string('video_materials', 'mod_lanebs').'</h3></div>';
+    $videosBlock = '<div class="row"></div>';
     foreach ($videos as $video) {
         $videosBlock .= '<div class="video row"><p data-action="player_modal" style="color:#4285f4;cursor:pointer;" data-id="'.$video->video_id.'"><u>'.$video->name.'</u></p></div>';
     }
@@ -87,19 +89,25 @@ if (!empty($videos)) {
 
 echo $OUTPUT->header();
 
+// временный костыль
+$cssHidden = '';
+if ($moduleinstance->type === 'video') {
+    $cssHidden = 'display:none!important';
+}
 echo
         '<div class="item-container d-flex">'.
             '<div style="flex:0.2">'.
                 '<div class="row d-flex justify-content-center">'.
                     '<img src="'.format_string($moduleinstance->cover).'" alt="'.get_string('lanebs_cover', 'mod_lanebs').'" style="width:70%">'.
                 '</div>'.
-                '<div class="row d-flex justify-content-center mt-3">'.
-                    '<button style="color:#174c8d;background-color:white;border-color:#4285f4;" class="btn btn-info" data-action="book_modal">'.get_string('lanebs_read', 'mod_lanebs').' '.format_string($moduleinstance->page_number).' '.get_string('lanebs_read_page', 'mod_lanebs').'</button>'.
+                '<div class="row d-flex justify-content-center mt-3" style="'.$cssHidden.'">'.
+                    '<button style="color:#616580;background-color:white;border-color:#4285f4;" class="btn btn-info" data-action="book_modal">'.get_string('lanebs_read', 'mod_lanebs').' '.format_string($moduleinstance->page_number).' '.get_string('lanebs_read_page', 'mod_lanebs').'</button>'.
                 '</div>'.
             '</div>'.
-            '<div class="item container mt-5 ml-4" style="flex:0.8;" data-id="'.format_string($moduleinstance->content).'" data-page="'.format_string($moduleinstance->page_number).'">'.
+            '<div class="item container mt-5 ml-4" style="flex:0.8;" data-id="'.format_string($moduleinstance->content).'" data-page="'.format_string($moduleinstance->page_number).'" data-type="'.format_string($moduleinstance->type).'">'.
                 '<div class="row">'.
-                    '<div class="biblio_record"><span>'.format_string($moduleinstance->biblio_record).'</span></div>'.
+                    '<p style="font-size:24px;color:#0F3269;">'.format_string($moduleinstance->name).' : </p>'.
+                    '<div class="biblio_record"><span>'.format_string(str_replace($moduleinstance->name,'', $moduleinstance->biblio_record)).'</span></div>'.
                     '<div class="intro mt-4"><span>'.format_string($moduleinstance->intro).'</span></div>'.
                 '</div>'.
                 $videosBlock.

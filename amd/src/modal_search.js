@@ -74,7 +74,7 @@ define([
         SEARCH_TEXTBOX: "[data-action='search_text']",
         START_SEARCH: "[data-action='search_button']",
         START_SEARCH_CLEAR: "[name='clear_search']",
-        CANCEL_BUTTON: "[data-action='cancel_button']",
+        CANCEL_BUTTON: "[data-action='cancel']",
         CONTENT_BLOCK: "[data-action='content_block']",
         BREADCRUMBS: ".breadcrumbs p",
         CONTENT_NAME: "[name='content_name']",

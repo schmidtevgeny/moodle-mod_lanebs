@@ -53,26 +53,16 @@ define([
             e.preventDefault();
             e.stopPropagation();
             this.getRoot().trigger('click');
+            this.getRoot().remove()
+            this.getModal().remove();
         }.bind(this));
 
         this.getModal().on(CustomEvents.events.activate, SELECTORS.CLOSE_CROSS, function (e) {
             e.preventDefault();
             e.stopPropagation();
             this.getRoot().trigger('click');
-        }.bind(this));
-
-        this.getRoot().on(CustomEvents.events.activate, function (e) {
-            let root = $(SELECTORS.ROOT_MODAL);
-            if (root.length > 1) { // because this modal second sometimes.
-                root = root[1];    // Kostil, but nothing to do
-            }
-            else {
-                root = root[0];
-            }
-            if (e.target === root) {
-                this.getRoot().remove();
-            }
-            return true;
+            this.getRoot().remove()
+            this.getModal().remove();
         }.bind(this));
 
         this.getModal().on(CustomEvents.events.scrollBottom, SELECTORS.CONTENT_BLOCK, function (e) {
@@ -80,12 +70,9 @@ define([
             let mobile = !!agent.match(/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos|ios)/g);
             mobile = mobile || (window.innerWidth < 1006); // kostil for ignore redirect window.location.origin + '/m'
             let linkId = $(e.currentTarget).attr('data-id');
-            console.log(linkId);
             let iframeBlock =
                 '<iframe id="player_iframe" src="https://www.youtube.com/embed/'+linkId+'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;">' +
                 '</iframe>';
-            console.log(iframeBlock);
-            console.log($(SELECTORS.CONTENT_BLOCK));
             $(SELECTORS.CONTENT_BLOCK).append(iframeBlock);
             ModalPlayer.prototype.modal.getBody().find(SELECTORS.CONTENT_BLOCK).append(iframeBlock);
         });

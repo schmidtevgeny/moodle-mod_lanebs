@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once(__DIR__.'/lib.php');
 
 /**
  * Module instance settings form.
@@ -49,10 +50,13 @@ class mod_lanebs_mod_form extends moodleform_mod {
         else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
             $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
         }
+        install_requirements(); // инициализация юзера, токена сервиса, права и т.д.
         $PAGE->requires->css('/mod/lanebs/css/modal_video.css');
         $PAGE->requires->css('/mod/lanebs/css/modal_book.css');
+        $PAGE->requires->css('/mod/lanebs/css/lanebs_modal.css');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
+        $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init');
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -61,7 +65,6 @@ class mod_lanebs_mod_form extends moodleform_mod {
         $mform->addElement('text', 'name', get_string('lanebsname', 'mod_lanebs'), array('size' => '64'));
 
         $mform->addElement('hidden', 'content', '');
-        //$mform->addRule('content', get_string('content_error', 'mod_lanebs'), 'required', null, 'client');
         $mform->setType('content', PARAM_TEXT);
 
         if (!empty($CFG->formatstringstriptags)) {
@@ -80,6 +83,10 @@ class mod_lanebs_mod_form extends moodleform_mod {
         } else {
             $this->add_intro_editor();
         }
+
+        $courseid = optional_param('course', 0, PARAM_INT);
+        $section = optional_param('section', 0, PARAM_INT);
+        $mform->addElement('button', 'lan_constructor_button', get_string('lan_constructor', 'mod_lanebs'), array('id' => 'lan_constructor_button', 'data-courseid' => $courseid, 'data-token' => '', 'data-section' => $section, 'data-service' => ''));
 
         $mform->addElement('button', 'modal_show_button', get_string('button_desc', 'mod_lanebs'));
 
@@ -112,11 +119,6 @@ class mod_lanebs_mod_form extends moodleform_mod {
         $mform->addElement('button', 'paste_mod', get_string('paste_settings', 'mod_lanebs'));
 
         $PAGE->requires->js_call_amd('mod_lanebs/copy_paste', 'init');
-
-        // Adding the rest of mod_lanebs settings, spreading all them into this fieldset
-        // ... or adding more fieldsets ('header' elements) if needed for better logic.
-        /*$mform->addElement('static', 'label1', 'lanebssettings', get_string('lanebssettings', 'mod_lanebs'));
-        $mform->addElement('header', 'lanebsfieldset', get_string('lanebsfieldset', 'mod_lanebs'));*/
 
         // Add standard elements.
         $this->standard_coursemodule_elements();

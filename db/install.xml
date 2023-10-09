@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/lanebs/db" VERSION="2021102128" COMMENT="XMLDB file for Moodle mod_lanebs"
+<XMLDB PATH="mod/lanebs/db" VERSION="2022090624" COMMENT="XMLDB file for Moodle mod_lanebs"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -19,6 +19,7 @@
         <FIELD NAME="cover" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Cover of the book"/>
         <FIELD NAME="biblio_record" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Bibliography record of book"/>
         <FIELD NAME="videos" SEQUENCE="false" TYPE="text" NOTNULL="false" COMMENT="Json with videos data" />
+        <FIELD NAME="type" SEQUENCE="false" TYPE="text" NOTNULL="false" COMMENT="Type of reader content (book, article)" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

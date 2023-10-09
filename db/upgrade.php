@@ -59,7 +59,16 @@ function xmldb_lanebs_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        upgrade_plugin_savepoint(true, 2022090534, 'mod', 'lanebs');
+        upgrade_plugin_savepoint(true,  2022090534, 'mod', 'lanebs');
+    }
+
+    if ($oldversion <= 2022090624) {
+        $table = new xmldb_table('lanebs');
+        $field = new xmldb_field('type', XMLDB_TYPE_TEXT, null, null, false, null, null, 'videos');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true,  2022090625, 'mod', 'lanebs');
     }
 
     return true;

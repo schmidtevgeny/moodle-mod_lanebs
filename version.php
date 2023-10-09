@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_lanebs';
-$plugin->release = '0.1.5';
-$plugin->version = 2022090541;
+$plugin->release = '1.1.0';
+$plugin->version = 2023091701;
 $plugin->requires = 2015111600;
 $plugin->maturity = MATURITY_STABLE;

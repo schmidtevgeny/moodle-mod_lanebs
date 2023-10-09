@@ -114,7 +114,7 @@ function lanebs_get_coursemodule_info($coursemodule) {
     $code = '$(document).ready(function () {$(".modtype_lanebs").find("img.activityicon").closest("div").css("background-color", "#fff");})';
     $PAGE->requires->js_amd_inline($code);
     if (!$lanebs = $DB->get_record('lanebs', array('id'=>$coursemodule->instance),
-        'id, course, name, content, content_name, page_number, cover, videos')) {
+        'id, course, name, content, content_name, page_number, cover, videos, type')) {
         return NULL;
     }
 
@@ -132,4 +132,109 @@ function lanebs_get_coursemodule_info($coursemodule) {
 
     //$info->content = '</div>';
     return $info;
+}
+
+/**
+ * Added user, token, etc.
+ *
+ */
+function install_requirements()
+{
+    global $DB;
+    $service = $DB->get_record('external_services', array('name' => 'lan_constructor_service'));
+    if ($service) {
+        $user = $DB->get_record('user', array('email' => 'lan@lanbook.ru'));
+        if (!$user) {
+            $user = new \stdClass();
+            $user->auth = 'manual';
+            $user->confirmed = 1;
+            $user->policyagreed = 0;
+            $user->deleted = 0;
+            $user->suspended = 0;
+            $user->mnethostid = 1;
+            $user->username = 'lanconstructor_service';
+            $user->password = 'lanconstructor_service';
+            $user->idnumber = '';
+            $user->firstname = 'Lan';
+            $user->lastname = 'Service';
+            $user->email = 'lan@lanbook.ru';
+            $user->emailstop = 0;
+            $user->icq = '';
+            $user->skype = '';
+            $user->yahoo = '';
+            $user->aim = '';
+            $user->msn = '';
+            $user->phone1 = '';
+            $user->phone2 = '';
+            $user->institution = '';
+            $user->department = '';
+            $user->address = '';
+            $user->city = '';
+            $user->country = 'RU';
+            $user->lang = 'ru';
+            $user->calendartype = 'gregorian';
+            $user->theme = '';
+            $user->timezone = 99;
+            $user->firstaccess = time();
+            $user->lastaccess = time();
+            $user->lastlogin = 0;
+            $user->lastip = '';
+            $user->secret = '';
+            $user->currentlogin = time();
+            $user->picture = 0;
+            $user->url = '';
+            $user->descriptionformat = 1;
+            $user->mailformat = 1;
+            $user->maildigest = 0;
+            $user->maildisplay = 2;
+            $user->autosubscribe = 0;
+            $user->trackforums = 0;
+            $user->timecreacted = time();
+            $user->timemodified = time();
+            $user->trustbitmask = 0;
+            $user->id = $DB->insert_record('user', $user);
+        }
+        // назначение роли user
+        $userid = $user->id;
+        $userRole = $DB->get_record('role', array('shortname' => 'user'));
+        if (!$userRole) {
+            $userRole = $DB->get_record('role', array('shortname' => 'admin'));
+        }
+        $roleAssignment = $DB->get_record('role_assignments', array('userid' => $userid, 'roleid' => $userRole->id));
+        if (!$roleAssignment) {
+            $roleAssignment = new \stdClass();
+            $roleAssignment->roleid = $userRole->id;
+            $roleAssignment->contextid = 1; // мб и что-то другое, потестить
+            $roleAssignment->userid = $userid;
+            $roleAssignment->timemodified = time();
+            $roleAssignment->modifierid = $userid;
+            $roleAssignment->component = '';
+            $roleAssignment->itemid = 0;
+            $roleAssignment->sortorder = 0;
+            $DB->insert_record('role_assignments', $roleAssignment);
+        }
+        $serviceUser = $DB->get_record('external_services_users', array('externalserviceid' => $service->id, 'userid' => $userid));
+        if (!$serviceUser) {
+            $serviceUser = new \stdClass();
+            $serviceUser->externalserviceid = $service->id;
+            $serviceUser->userid = $userid;
+            $serviceUser->timecreated = time();
+            $DB->insert_record('external_services_users', $serviceUser);
+        }
+        $token = $DB->get_record('external_tokens', array('externalserviceid' => $service->id, 'userid' => $userid));
+        if (!$token) {
+            $token = new \stdClass();
+            $token->token = md5(uniqid(mt_rand(), 1));
+            $token->privatetoken = random_string(64);
+            $token->tokentype = 0;
+            $token->userid = $userid;
+            $token->externalserviceid = $service->id;
+            $token->contextid = 1;
+            $token->creatorid = $userid;
+            $token->validuntil = 0;
+            $token->timecreated = time();
+            $token->lastaccess = time();
+            $DB->insert_record('external_tokens', $token);
+        }
+    }
 }

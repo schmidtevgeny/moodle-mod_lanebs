@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Интеграция с ЭБС Лань';
-$string['modulename'] = 'Интеграция с ЭБС Лань';
+$string['pluginname'] = 'ЭУК-конструктор ЭБС Лань';
+$string['modulename'] = 'ЭУК-конструктор ЭБС Лань';
 $string['modulename_help'] = 'Загрузка ресурса из списка ресурсов';
 $string['lanebsname'] = 'Название ресурса';
 $string['lanebsname_help'] = 'Введите название библиотеки';
@@ -74,7 +74,7 @@ $string['lanebs_add'] = 'Добавить';
 $string['lanebs_preshow'] = 'Предпросмотр';
 $string['lanebs_error_empty_search'] = 'Книги не найдены';
 $string['lanebs_BACK'] = 'НАЗАД';
-$string['lanebs_auth_error'] = 'Не правильный токен подписчика. Предоставлен гостевой доступ!';
+$string['lanebs_auth_error'] = 'Токен доступа отсутствует или неверный';
 $string['lanebs_error_close'] = 'Кнопка "Закрыть" не найдена';
 $string['lanebs_prev'] = 'Предыдущая';
 $string['lanebs_next'] = 'Следующая';
@@ -96,3 +96,4 @@ $string['paste_settings'] = 'Вставить настройки';
 $string['plugin_title'] = 'Библиотечная интеграция';
 $string['subscriber_token'] = 'Токен подписчика';
 $string['token_desc'] = 'Токен подписчика для доступа к читалке';
+$string['lan_constructor'] = 'ЭУК-конструктор ЭБС Лань';

@@ -50,7 +50,6 @@ function xmldb_lanebs_install() {
     $obj->descriptionformat = 1;
     $obj->categoryid = $id;
     $obj->sortorder = 0;
-    $obj->sortorder = 0;
     $obj->required = 0;
     $obj->locked = 0;
     $obj->visible = 0;

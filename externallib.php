@@ -33,11 +33,11 @@ class mod_lanebs_external extends external_api
 
     private static $subscribeToken = false;
     private static $readerToken = false;
-    private static $authUrl = 'https://security.lanbook.com';//'https://security.test.lanbook.com';
-    private static $baseUrl = 'https://moodle-api.e.lanbook.com';//'https://moodle-api.test.lanbook.com';
+    private static $authUrl = 'https://security.lanbook.com';
+    private static $baseUrl = 'https://moodle-api.e.lanbook.com';
     private static $readerUrl = 'https://reader.lanbook.com';
     private static $mobileReaderUrl = 'https://reader.lanbook.com';
-    private const SORT_CREATE_DESC = 'create_time';
+    const SORT_CREATE_DESC = 'create_time';
 
     /**
      * Return category_tree webservice parameters.
@@ -247,14 +247,15 @@ class mod_lanebs_external extends external_api
         $curl->setopt($options);
         $curl->setopt(['CURLOPT_HTTPHEADER' => ['x-auth-token-subscriber: '.self::$subscribeToken]]);
         $data = $curl->get(self::$authUrl . '/api/sign_in/moodle', null, $options);
-        $token = (json_decode($data))->jwt->access_token;
+        $data = json_decode($data);
+        $token = $data->jwt->access_token;
         if ($token) {
             $_SESSION['mod_lanebs_readerToken'] = $token;
         }
         else {
             $_SESSION['mod_lanebs_readerToken'] = false;
         }
-        return array('body' => $data);
+        return array('body' => json_encode($data));
     }
 
     public static function auth_returns()
@@ -365,7 +366,7 @@ class mod_lanebs_external extends external_api
                 }
             }
         } else {
-            $tocName = $items->body->items;
+            $tocName = (isset($items->body->items) && !empty($items->body->items)) ? $items->body->items : null;
         }
         return array(
             'body' => json_encode($tocName)
@@ -414,14 +415,16 @@ class mod_lanebs_external extends external_api
         $data = $curl->get($readerUrl, null, $options);
         $items = json_decode($data);
         $formatItems = array();
-        foreach ($items->body->items as $index => $item) {
-            $formatItems[] = array(
-                'book_id' => (string)$item->book_id,
-                'start_page' => (string)$item->start_page,
-                'link_name' => $item->link_name,
-                'link_url' => $item->link_url,
-                'unique_id' => ++$index
-            );
+        if (isset($items->body->items) && !empty($items->body->items)) {
+            foreach ($items->body->items as $index => $item) {
+                $formatItems[] = array(
+                    'book_id' => (string)$item->book_id,
+                    'start_page' => (string)$item->start_page,
+                    'link_name' => $item->link_name,
+                    'link_url' => $item->link_url,
+                    'unique_id' => ++$index
+                );
+            }
         }
         return array(
             'body' => json_encode($formatItems)
@@ -450,4 +453,6 @@ class mod_lanebs_external extends external_api
         $data = preg_replace($patternSrc, $replaceSrc, $data);
         return $data;
     }
+
+
 }
