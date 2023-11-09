@@ -2,7 +2,9 @@
     max-width: 100%!important;
     height: 94%!important;
 }
-
+.modal_dialog_lan_videos {
+    max-width: 800px!important;
+}
 .modal_content_lan_reader {
 	height: 100%!important;
 }

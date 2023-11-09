@@ -1,12 +1,20 @@
 <?php
-
 $services = array(
     'lab_ebsservice' => array(
-        'functions' => array('mod_lanebs_search_books', 'mod_lanebs_book_content', 'mod_lanebs_category_tree', 'mod_lanebs_auth', 'mod_lanebs_lanebs_info', 'mod_lanebs_toc_name', 'mod_lanebs_toc_videos'),
-        'requiredcapability' => ['mod_lanebs:get_tree'],
+        'functions' => array('mod_lanebs_search_books', 'mod_lanebs_book_content', 'mod_lanebs_category_tree', 'mod_lanebs_auth', 'mod_lanebs_lanebs_info', 'mod_lanebs_toc_name', 'mod_lanebs_toc_videos', 'mod_lanebs_video_stat'),
+        'requiredcapability' => 'mod/lanebs:get_tree',
         'restrictedusers' => 1,
         'enabled' => 1,
         'shortname' => 'LanEbsIntegration',
+        'downloadfiles' => 0,
+        'uploadfiles' => 0,
+    ),
+    'lan_constructor_service' => array(
+        'functions' => array('mod_lanebs_create_mod_lanebs', 'mod_lanebs_get_service_token', 'mod_lanebs_get_subscriber_token', 'mod_lanebs_get_reader_token', 'mod_lanebs_get_script_names'),
+        'requiredcapability' => 'mod/lanebs:get_constructor',
+        'restrictedusers' => 1,
+        'enabled' => 1,
+        'shortname' => 'LanConstructor',
         'downloadfiles' => 0,
         'uploadfiles' => 0,
     ),
@@ -21,7 +29,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree')
+        'capabilities' => 'lanebs:get_tree'
     ),
     'mod_lanebs_book_content' => array(
         'classname' => 'mod_lanebs_external',
@@ -31,7 +39,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree')
+        'capabilities' => 'lanebs:get_tree'
     ),
     'mod_lanebs_category_tree' => array(
         'classname' => 'mod_lanebs_external',
@@ -41,7 +49,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree'),
+        'capabilities' => 'lanebs:get_tree',
     ),
     'mod_lanebs_auth' => array(
         'classname' => 'mod_lanebs_external',
@@ -51,7 +59,7 @@ $functions = array(
         'type'  => 'read',
         'ajax'  => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree'),
+        'capabilities' => 'lanebs:get_tree',
     ),
     'mod_lanebs_lanebs_info' => array(
         'classname' => 'mod_lanebs_external',
@@ -61,7 +69,7 @@ $functions = array(
         'type'  => 'read',
         'ajax'  => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree'),
+        'capabilities' => 'lanebs:get_tree',
     ),
     'mod_lanebs_toc_name' => array(
         'classname' => 'mod_lanebs_external',
@@ -71,7 +79,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree'),
+        'capabilities' => 'lanebs:get_tree',
     ),
     'mod_lanebs_toc_videos' => array(
         'classname' => 'mod_lanebs_external',
@@ -81,6 +89,66 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'capabilities' => array('lanebs:get_tree'),
+        'capabilities' => 'lanebs:get_tree',
+    ),
+    'mod_lanebs_create_mod_lanebs' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'create_mod_lanebs',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Create lanebs module',
+        'type' => 'write',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_get_service_token' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'get_service_token',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Get service token',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_get_subscriber_token' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'get_subscriber_token',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Get subscriber token',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_get_reader_token' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'get_reader_token',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Get reader token',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_get_script_names' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'get_script_names',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Get script names',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_video_stat' => array(
+        'classname' => 'mod_lanebs_external',
+        'methodname' => 'video_stat',
+        'classpath' => 'mod/lanebs/externallib.php',
+        'description' => 'Send video stat',
+        'type' => 'read',
+        'ajax' => true,
+        'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_tree',
     ),
 );

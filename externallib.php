@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-header('Access-Control-Allow-Origin: *');
+
 /**
  * Webservices for lanebs.
  *
@@ -33,11 +33,12 @@ class mod_lanebs_external extends external_api
 
     private static $subscribeToken = false;
     private static $readerToken = false;
-    private static $authUrl = 'https://security.lanbook.com';//'https://security.test.lanbook.com';
-    private static $baseUrl = 'https://moodle-api.e.lanbook.com';//'https://moodle-api.test.lanbook.com';
+    private static $authUrl = 'https://security.lanbook.com';
+    private static $baseUrl = 'https://moodle-api.e.lanbook.com';
     private static $readerUrl = 'https://reader.lanbook.com';
+    private static $profileUrl = 'https://profile.e.lanbook.com';
     private static $mobileReaderUrl = 'https://reader.lanbook.com';
-    private const SORT_CREATE_DESC = 'create_time';
+    const SORT_CREATE_DESC = 'create_time';
 
     /**
      * Return category_tree webservice parameters.
@@ -245,16 +246,20 @@ class mod_lanebs_external extends external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt([ 'CURLOPT_HTTPHEADER' => ['x-auth-token-subscriber: '.self::$subscribeToken]]);
+        $curl->setopt(['CURLOPT_HTTPHEADER' =>
+            [
+                'x-auth-token-subscriber: '.self::$subscribeToken,
+            ]]);
         $data = $curl->get(self::$authUrl . '/api/sign_in/moodle', null, $options);
-        $token = (json_decode($data))->jwt->access_token;
+        $data = json_decode($data);
+        $token = $data->jwt->access_token;
         if ($token) {
             $_SESSION['mod_lanebs_readerToken'] = $token;
         }
         else {
             $_SESSION['mod_lanebs_readerToken'] = false;
         }
-        return array('body' => $data);
+        return array('body' => json_encode($data));
     }
 
     public static function auth_returns()
@@ -365,7 +370,7 @@ class mod_lanebs_external extends external_api
                 }
             }
         } else {
-            $tocName = $items->body->items;
+            $tocName = (isset($items->body->items) && !empty($items->body->items)) ? $items->body->items : null;
         }
         return array(
             'body' => json_encode($tocName)
@@ -414,14 +419,16 @@ class mod_lanebs_external extends external_api
         $data = $curl->get($readerUrl, null, $options);
         $items = json_decode($data);
         $formatItems = array();
-        foreach ($items->body->items as $index => $item) {
-            $formatItems[] = array(
-                'book_id' => (string)$item->book_id,
-                'start_page' => (string)$item->start_page,
-                'link_name' => $item->link_name,
-                'link_url' => $item->link_url,
-                'unique_id' => ++$index
-            );
+        if (isset($items->body->items) && !empty($items->body->items)) {
+            foreach ($items->body->items as $index => $item) {
+                $formatItems[] = array(
+                    'book_id' => (string)$item->book_id,
+                    'start_page' => (string)$item->start_page,
+                    'link_name' => $item->link_name,
+                    'link_url' => $item->link_url,
+                    'unique_id' => ++$index
+                );
+            }
         }
         return array(
             'body' => json_encode($formatItems)
@@ -433,6 +440,50 @@ class mod_lanebs_external extends external_api
         return new external_single_structure(
             array(
                 'body' => new external_value(PARAM_RAW, 'Needed TOC videos')
+            )
+        );
+    }
+
+    public static function video_stat_returns()
+    {
+        return new external_single_structure(
+            array(
+                'body' => new external_value(PARAM_RAW, 'result')
+            )
+        );
+    }
+
+    public static function video_stat($bookId, $videoId)
+    {
+        $curl = new curl();
+        if (isset($_SESSION['mod_lanebs_readerToken']) && !empty($_SESSION['mod_lanebs_readerToken'])) {
+            self::$readerToken = $_SESSION['mod_lanebs_readerToken'];
+        }
+        if (isset($_SESSION['mod_lanebs_subscriberToken']) && !empty($_SESSION['mod_lanebs_subscriberToken'])) {
+            self::$subscribeToken = $_SESSION['mod_lanebs_subscriberToken'];
+        }
+        $options = array(
+            'CURLOPT_POST'              => true,
+            'CURLOPT_SSL_VERIFYPEER'    => true,
+            'CURLOPT_RETURNTRANSFER'    => true,
+            'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+            'CURLOPT_COOKIE'            => 'lan_access_token='.self::$readerToken.';path=/;domain=.lanbook.com;',
+            'CURLOPT_REFERER'           => self::$readerUrl,
+        );
+        $curl->setopt($options);
+        $profileUrl = self::$profileUrl . '/api/v2/cabinet/reader/seealso/log';
+        $data = $curl->post($profileUrl, array('book_id' => $bookId, 'seealso_id' => $videoId, 'mode' => 'moodlePlugin'), $options);
+        return array(
+            'body' => json_encode($data)
+        );
+    }
+
+    public static function video_stat_parameters()
+    {
+        return new external_function_parameters(
+            array(
+                'bookId' => new external_value(PARAM_TEXT, 'Book ID'),
+                'videoId' => new external_value(PARAM_TEXT, 'Video ID'),
             )
         );
     }
@@ -450,4 +501,6 @@ class mod_lanebs_external extends external_api
         $data = preg_replace($patternSrc, $replaceSrc, $data);
         return $data;
     }
+
+
 }

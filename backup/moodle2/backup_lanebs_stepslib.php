@@ -35,7 +35,7 @@ class backup_lanebs_activity_structure_step extends backup_activity_structure_st
         $lanebs = new backup_nested_element('lanebs', array('id'), array(
             'name', 'timecreated', 'timemodified', 'intro',
             'introformat', 'content', 'content_name', 'page_number',
-            'cover', 'biblio_record'));
+            'cover', 'biblio_record', 'videos'));
 
         // Define sources
         $lanebs->set_source_table('lanebs', array('id' => backup::VAR_ACTIVITYID));

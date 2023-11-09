@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Интеграция с ЭБС Лань';
-$string['modulename'] = 'Интеграция с ЭБС Лань';
-$string['modulename_help'] = 'Загрузка ресурса из списка ресурсов';
+$string['pluginname'] = 'ЭУК-конструктор ЭБС Лань';
+$string['modulename'] = 'ЭУК-конструктор ЭБС Лань';
+$string['modulename_help'] = 'Плагин позволяет бесшовно интегрировать образовательный контент из ЭБС Лань (ссылки на страницы учебников, видеоролики) в состав электронных курсов. Использование Плагина оптимизирует время на разработку электронных курсов, расширяет возможности преподавателя, вовлекает студентов в изучение материала и тем самым повышает эффективность обучения в электронной образовательной среде.';
 $string['lanebsname'] = 'Название ресурса';
 $string['lanebsname_help'] = 'Введите название библиотеки';
 $string['button_desc'] = 'Выбор ресурса';
@@ -50,6 +50,8 @@ $string['button_label_str'] = 'Кнопка поиска';
 $string['button_str'] = 'Найти';
 $string['cancel_str'] = 'Закрыть';
 $string['lanebs:get_tree'] = 'Право получать дерево каталога';
+$string['lanebs:get_constructor'] = 'Право получать доступ к сервису Лань Конструктор';
+$string['lanebs:addinstance'] = 'Право создавать инстансы модуля Лань Конструктор';
 $string['title_modal_book'] = 'Предпросмотр';
 $string['content_error'] = 'Выберите ресурс';
 $string['lanebsbutton'] = 'Выбор ресурса';
@@ -74,7 +76,7 @@ $string['lanebs_add'] = 'Добавить';
 $string['lanebs_preshow'] = 'Предпросмотр';
 $string['lanebs_error_empty_search'] = 'Книги не найдены';
 $string['lanebs_BACK'] = 'НАЗАД';
-$string['lanebs_auth_error'] = 'Не правильный токен подписчика. Предоставлен гостевой доступ!';
+$string['lanebs_auth_error'] = 'Токен доступа отсутствует или неверный';
 $string['lanebs_error_close'] = 'Кнопка "Закрыть" не найдена';
 $string['lanebs_prev'] = 'Предыдущая';
 $string['lanebs_next'] = 'Следующая';
@@ -96,3 +98,6 @@ $string['paste_settings'] = 'Вставить настройки';
 $string['plugin_title'] = 'Библиотечная интеграция';
 $string['subscriber_token'] = 'Токен подписчика';
 $string['token_desc'] = 'Токен подписчика для доступа к читалке';
+$string['lan_constructor'] = 'ЭУК-конструктор ЭБС Лань';
+$string['privacy:metadata'] = 'ЭУК-конструктор ЭБС Лань не хранит никаких персональных данных';
+$string['lanebs_role'] = 'Роль для вебсервиса ЭУК-конструктора ЭБС Лань';

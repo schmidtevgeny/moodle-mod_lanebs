@@ -31,11 +31,31 @@ defined('MOODLE_INTERNAL') || die();
  * The mod_lanebs course module viewed event class.
  *
  * @package    mod_lanebs
- * @since      Moodle 2.7
+ * @since      Moodle 3.7
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
+
+    /**
+     * Create instance of event.
+     *
+     * @since Moodle 3.7
+     *
+     * @param \stdClass $lanebs
+     * @param \context_module $context
+     * @return \mod_lanebs\event\course_module_viewed
+     */
+    public static function create_from_lanebs(\stdClass $lanebs, \context_module $context) {
+        $data = array(
+            'context' => $context,
+            'objectid' => $lanebs->id
+        );
+        /** @var course_module_viewed $event */
+        $event = self::create($data);
+        $event->add_record_snapshot('lanebs', $lanebs);
+        return $event;
+    }
 
     /**
      * Set basic properties for the event.
