@@ -73,3 +73,6 @@
 .modal_content_lan_reader .modal-body {
     height: 95%;
 }
+.modal_content_lan_reader .modalNotice__text {
+    height: 100%;
+}

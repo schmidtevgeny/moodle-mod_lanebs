@@ -71,5 +71,17 @@ function xmldb_lanebs_upgrade($oldversion) {
         upgrade_plugin_savepoint(true,  2022090625, 'mod', 'lanebs');
     }
 
+    /*if ($oldversion <= 2023111122) {
+        $wsName = 'ws-lanconstructor-role';
+        $wsroleId = $DB->get_record('role', array('shortname' => $wsName));
+        if (!empty($wsroleId)) {
+            //$webserviceUser = core_user::get_user_by_email('lan@lanbook.com');
+            $systemContext = context_system::instance();
+            assign_capability('moodle/question:add', CAP_ALLOW, $wsroleId->id, $systemContext->id, true);
+            assign_capability('moodle/question:managecategory', CAP_ALLOW, $wsroleId->id, $systemContext->id, true);
+            //role_assign($wsroleId->id, $webserviceUser->id, $systemContext->id);
+        }
+    }*/
+
     return true;
 }

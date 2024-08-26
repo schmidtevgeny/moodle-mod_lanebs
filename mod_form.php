@@ -44,19 +44,19 @@ class mod_lanebs_mod_form extends moodleform_mod {
 
         $mform = $this->_form;
         $settings = get_config("lanebs");
+        $baseUrl = get_lanebs_config('base_url');
         if (isset($settings->token) && !empty($settings->token)) {
             $_SESSION['mod_lanebs_subscriberToken'] = $settings->token;
         }
         else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
             $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
         }
-        install_requirements(); // инициализация юзера, токена сервиса, права и т.д.
-        $PAGE->requires->css('/mod/lanebs/css/modal_video.css');
-        $PAGE->requires->css('/mod/lanebs/css/modal_book.css');
-        $PAGE->requires->css('/mod/lanebs/css/lanebs_modal.css');
+        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_video.css');
+        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_book.css');
+        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/lanebs_modal.css');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
-        $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init');
+        $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init', array('base_url' => $baseUrl));
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -86,17 +86,19 @@ class mod_lanebs_mod_form extends moodleform_mod {
 
         $courseid = optional_param('course', 0, PARAM_INT);
         $section = optional_param('section', 0, PARAM_INT);
-        $mform->addElement('button', 'lan_constructor_button', get_string('lan_constructor', 'mod_lanebs'), array('id' => 'lan_constructor_button', 'data-courseid' => $courseid, 'data-token' => '', 'data-section' => $section, 'data-service' => ''));
+        if ($courseid !== 0) {
+            $mform->addElement('button', 'lan_constructor_button', get_string('lan_constructor', 'mod_lanebs'), array('id' => 'lan_constructor_button', 'data-courseid' => $courseid, 'data-token' => '', 'data-section' => $section, 'data-service' => ''));
+        }
 
-        $mform->addElement('button', 'modal_show_button', get_string('button_desc', 'mod_lanebs'));
+        //$mform->addElement('button', 'modal_show_button', get_string('button_desc', 'mod_lanebs'));
+        //$mform->addHelpButton('modal_show_button', 'lanebsbutton', 'mod_lanebs');
 
-        $mform->addElement('button', 'modal_video_button', get_string('video_button_desc', 'mod_lanebs'), array('data-action' => 'video_modal', 'class' => 'hidden'));
-        $mform->addElement('html', '<div class="video_preview_container row"></div>');
+        //$mform->addElement('button', 'modal_video_button', get_string('video_button_desc', 'mod_lanebs'), array('data-action' => 'video_modal', 'class' => 'hidden'));
+        //$mform->addElement('html', '<div class="video_preview_container row"></div>');
 
         $mform->addElement('text', 'content_name', get_string('choosen_resourse', 'mod_lanebs'), ['style' => 'width:100%']);
         $mform->addRule('content_name', null, 'required', null, 'client');
         $mform->setType('content_name', PARAM_TEXT);
-        $mform->addHelpButton('modal_show_button', 'lanebsbutton', 'mod_lanebs');
 
         $mform->addElement('text', 'page_number', get_string('page_number', 'mod_lanebs'), ['style' => 'width:50%']);
         $mform->addRule('page_number', null, 'required', null, 'client');
@@ -111,6 +113,8 @@ class mod_lanebs_mod_form extends moodleform_mod {
 
         $mform->addElement('hidden', 'videos', get_string('video', 'mod_lanebs'));
         $mform->setType('videos', PARAM_TEXT);
+
+        $mform->addElement('html', '<div class="mod_lanebs_version">v'.get_lanebs_config('release').'</div>');
 
         $mform->addElement('header', 'copy-paste_mod', get_string('copy_paste', 'mod_lanebs'));
         if ($id) {

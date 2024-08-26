@@ -17,15 +17,25 @@ $capabilities = array(
         'archetypes'   => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-    )),
+        ),
+    ),
     'mod/lanebs:addinstance' => array(
-            'riskbitmask' => RISK_SPAM | RISK_XSS,
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_COURSE,
-            'archetypes' => array(
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ),
-    'clonepermissionsfrom' => 'moodle/course:manageactivities'
-    )
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities'
+    ),
+    'mod/lanebs:get_constructor' => array(
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ),
+    ),
 );

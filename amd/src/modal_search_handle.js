@@ -30,22 +30,21 @@ define(["exports", "jquery", "core/modal_factory", "core/str", "mod_lanebs/modal
                     });
                     return resultStrings;
                 };
-                ModalFactory.create({type: ModalSearch.TYPE}, trigger)
-                    .then(function (modal) {
-                        Str.get_strings(getLangStrings()).
-                            done(function (strs) {ModalSearch.prototype.strings = stringsTransform(strs);}).
-                            fail(function (e) {console.log(e);});
-                        $(modal.getRoot()).find('.modal-dialog').css('max-width', '1500px');
-                        $(modal.getRoot()).find('.modal-body').css('height', '770px');
-                        $(modal.getRoot()).find('.modal-body').css('overflow-y', 'auto');
-                        ModalSearch.prototype.getAjaxCall('mod_lanebs_auth', [], function (data) {
-                            if (data['code'] === 403 || data['code'] === 401) {
-                                Str.get_string('lanebs_auth_error', 'mod_lanebs').then(function (str) {
-                                    alert(str);
-                                });
-                            }
-                        });
+                ModalFactory.create({type: ModalSearch.TYPE}, trigger).then(function (modal) {
+                    Str.get_strings(getLangStrings()).
+                        done(function (strs) {ModalSearch.prototype.strings = stringsTransform(strs);}).
+                        fail(function (e) {console.log(e);});
+                    $(modal.getRoot()).find('.modal-dialog').css('max-width', '1500px');
+                    $(modal.getRoot()).find('.modal-body').css('height', '770px');
+                    $(modal.getRoot()).find('.modal-body').css('overflow-y', 'auto');
+                    ModalSearch.prototype.getAjaxCall('mod_lanebs_auth', [], function (data) {
+                        if (data['code'] === 403 || data['code'] === 401) {
+                            Str.get_string('lanebs_auth_error', 'mod_lanebs').then(function (str) {
+                                console.log(str);
+                            });
+                        }
                     });
+                });
             }
         };
     });

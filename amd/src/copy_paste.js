@@ -30,7 +30,6 @@ define(["exports", "jquery", "core/ajax", "core/str"],
                         Str.get_string('lanebs_copy_attention', 'mod_lanebs').
                         done(function (str) {
                             console.log(str);
-                            alert(str);
                         });
                     }
                     localStorage.setItem('lanebs_mod', modId);
@@ -41,7 +40,6 @@ define(["exports", "jquery", "core/ajax", "core/str"],
                         Str.get_string('lanebs_copy_error', 'mod_lanebs').
                         done(function (str) {
                             console.log(str);
-                            alert(str);
                         });
                     } else {
                         let args = {

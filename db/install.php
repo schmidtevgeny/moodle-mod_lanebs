@@ -29,40 +29,6 @@ defined('MOODLE_INTERNAL') || die();
  * Custom code to be run on installing the plugin.
  */
 function xmldb_lanebs_install() {
-    global $DB;
 
-    $obj = new stdClass();
-    $obj->name = get_string('plugin_title', 'mod_lanebs');
-    $obj->sortorder = 1;
-    $result = $DB->get_record('user_info_category', array('name' => $obj->name), '*');
-    if (!$result) {
-        $id = $DB->insert_record('user_info_category', $obj);
-    }
-    else {
-        $id = $result->id;
-    }
-
-    $obj = new stdClass();
-    $obj->shortname = 'mod_lanebs_token';
-    $obj->name = get_string('subscriber_token', 'mod_lanebs');
-    $obj->datatype = 'text';
-    $obj->description = '<p>'.get_string('token_desc', 'mod_lanebs').'</p>';
-    $obj->descriptionformat = 1;
-    $obj->categoryid = $id;
-    $obj->sortorder = 0;
-    $obj->required = 0;
-    $obj->locked = 0;
-    $obj->visible = 0;
-    $obj->forceunique = 0;
-    $obj->signup = 0;
-    $obj->defaultdataformat = 0;
-    $obj->param1 = 30;
-    $obj->param2 = 2048;
-    $obj->param3 = 0;
-    $result = $DB->get_record('user_info_field', array('shortname' => $obj->shortname), '*');
-    if (!$result) {
-        $DB->insert_record('user_info_field', $obj);
-    }
-    purge_all_caches();
     return true;
 }

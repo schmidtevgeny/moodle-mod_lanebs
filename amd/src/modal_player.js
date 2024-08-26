@@ -26,6 +26,7 @@ define([
         CLOSE_BUTTON: '[data-action="close_button"]',
         CLOSE_CROSS: ".close",
         ROOT_MODAL: "[data-region='modal-container']",
+        PLAYER_MODAL: 'p[data-action="player_modal"]',
     };
 
     /**
@@ -45,6 +46,7 @@ define([
     ModalPlayer.CONTENT_BLOCK = SELECTORS.CONTENT_BLOCK;
     ModalPlayer.prototype = Object.create(Modal.prototype);
     ModalPlayer.prototype.constructor = ModalPlayer;
+    ModalPlayer.prototype.PLAYER_MODAL = SELECTORS.PLAYER_MODAL;
 
     ModalPlayer.prototype.registerEventListeners = function () {
         Modal.prototype.registerEventListeners.call(this);
@@ -75,6 +77,15 @@ define([
                 '</iframe>';
             $(SELECTORS.CONTENT_BLOCK).append(iframeBlock);
             ModalPlayer.prototype.modal.getBody().find(SELECTORS.CONTENT_BLOCK).append(iframeBlock);
+            ajax.call([
+                {
+                    methodname: 'mod_lanebs_send_log',
+                    args: {
+                        id: linkId,
+                        type: 'video'
+                    },
+                }
+            ]);
         });
     };
 

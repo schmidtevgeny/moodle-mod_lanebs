@@ -28,6 +28,7 @@ define([
         ROOT_MODAL: "[data-region='modal-container']",
         CONTAINER: "[data-region='modal-container']",
         MODAL: "[data-region='modal']",
+        MODAL_BOOK_BUTTON: '[data-action="book_modal"]'
     };
 
     /**
@@ -45,56 +46,20 @@ define([
 
     ModalBook.TYPE = 'mod_lanebs-book';
     ModalBook.CONTENT_BLOCK = SELECTORS.CONTENT_BLOCK;
+
     ModalBook.prototype = Object.create(Modal.prototype);
     ModalBook.prototype.constructor = ModalBook;
+    ModalBook.prototype.MODAL_BOOK_BUTTON = SELECTORS.MODAL_BOOK_BUTTON;
 
     ModalBook.prototype.registerEventListeners = function () {
         Modal.prototype.registerEventListeners.call(this);
-
-        /*this.getModal().on(CustomEvents.events.activate, SELECTORS.CLOSE_BUTTON, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.getRoot().trigger('click');
-            this.getRoot().remove();
-            this.getModal().remove();
-        }.bind(this));
-
-        this.getModal().on(CustomEvents.events.activate, SELECTORS.CLOSE_CROSS, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.getRoot().trigger('click');
-            this.getRoot().remove()
-            this.getModal().remove();
-        }.bind(this));*/
 
         this.getRoot().on(CustomEvents.events.activate, SELECTORS.CLOSE_BUTTON+', '+SELECTORS.CLOSE_CROSS, function () {
             this.destroy();
             this.getBackdrop().then(function (backdrop) {
                 backdrop.hide();
             });
-            console.log('destroy');
         }.bind(this));
-
-/*        this.getModal().on(CustomEvents.events.activate, SELECTORS.CLOSE_BUTTON+', '+SELECTORS.CLOSE_CROSS, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.getRoot().trigger('click');
-            if (this.getModal() && this.getRoot()) {
-                this.getModal().remove();
-                this.getRoot().remove();
-            }
-            return true;
-        }.bind(this));
-
-        this.getRoot().click(function(e) {
-            if (!$(e.target).closest(SELECTORS.MODAL).length) {
-                if ($(e.target).closest(SELECTORS.CONTAINER).length) {
-                    this.getModal().remove();
-                    this.getRoot().remove();
-                }
-            }
-            return true;
-        }.bind(this));*/
 
         this.getModal().on(CustomEvents.events.scrollBottom, SELECTORS.CONTENT_BLOCK, function (e) {
             let agent = navigator.userAgent.toLowerCase();
@@ -116,6 +81,15 @@ define([
                 let pageNumber = $(SELECTORS.CONTENT_BLOCK).attr('data-page');
                 let type = $(SELECTORS.CONTENT_BLOCK).attr('data-type');
                 ModalBook.prototype.getBookResult(response['body'], pageNumber, id, type);
+                ajax.call([
+                {
+                    methodname: 'mod_lanebs_send_log',
+                    args: {
+                        id: id,
+                        type: type
+                    },
+                }
+                ]);
             }).fail(function (response) {
                 console.log(response);
             });
@@ -124,7 +98,7 @@ define([
 
     ModalBook.prototype.getBookResult = function (response, pageNumber, bookId, type = 'book') {
         let iframeBook = document.getElementById('book_iframe');
-        let readerBase = 'https://reader.lanbook.com/'+type+'/';//'https://reader.landev.ru/book/';
+        let readerBase = 'https://reader.lanbook.com/'+type+'/';
         let readerUrl = readerBase+bookId+'?jwtToken='+response+'&mode=moodlePlugin'+'#'+pageNumber;
         $(iframeBook).attr('src', readerUrl);
     };

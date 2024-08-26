@@ -15,23 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Code to be executed after the plugin has been uninstalled is defined here.
  *
  * @package     mod_lanebs
- * @copyright   2020 Senin Yurii <katorsi@mail.ru>
+ * @category    uninstall
+ * @copyright   2022 Senin Yurii <syi@landev.ru>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_lanebs';
-$plugin->release = '1.3.13';
-$plugin->version = 2024012829;
-$plugin->requires = 2015111600;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->base_url = 'https://c.lanbook.com';
-$plugin->auth_url = 'https://security.lanbook.com';
-$plugin->moodle_api = 'https://moodle-api.e.lanbook.com';
-$plugin->search_api = 'http://212.41.20.23:8080';
-$plugin->reader_url = 'https://reader.lanbook.com';
-$plugin->profile_url = 'https://profile.e.lanbook.com';
+require_once __DIR__ . '/../lib.php';
+
+/**
+ * Custom code to be run on uninstalling the plugin.
+ */
+function xmldb_lanebs_uninstall() {
+    $data = array(
+        'type' => 'uninstall'
+    );
+    send_stat($data);
+
+    return true;
+}

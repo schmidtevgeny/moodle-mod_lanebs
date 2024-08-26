@@ -1,9 +1,8 @@
 <?php
-
 $services = array(
     'lab_ebsservice' => array(
-        'functions' => array('mod_lanebs_search_books', 'mod_lanebs_book_content', 'mod_lanebs_category_tree', 'mod_lanebs_auth', 'mod_lanebs_lanebs_info', 'mod_lanebs_toc_name', 'mod_lanebs_toc_videos'),
-        'requiredcapability' => 'mod_lanebs:get_tree',
+        'functions' => array('mod_lanebs_search_books', 'mod_lanebs_book_content', 'mod_lanebs_category_tree', 'mod_lanebs_auth', 'mod_lanebs_lanebs_info', 'mod_lanebs_toc_name', 'mod_lanebs_toc_videos', 'mod_lanebs_video_stat'),
+        'requiredcapability' => 'mod/lanebs:get_tree',
         'restrictedusers' => 1,
         'enabled' => 1,
         'shortname' => 'LanEbsIntegration',
@@ -11,10 +10,11 @@ $services = array(
         'uploadfiles' => 0,
     ),
     'lan_constructor_service' => array(
-        'functions' => array('mod_lanebs_create_mod_lanebs', 'mod_lanebs_get_service_token', 'mod_lanebs_get_subscriber_token', 'mod_lanebs_get_reader_token', 'mod_lanebs_get_script_names'),
-        'restrictedusers' => 0,
+        'functions' => array('mod_lanebs_create_mod_lanebs', 'mod_lanebs_get_service_token', 'mod_lanebs_get_subscriber_token', 'mod_lanebs_get_reader_token', 'mod_lanebs_get_script_names', 'mod_lanebs_create_mod_quiz', 'mod_lanebs_send_log'),
+        'requiredcapability' => 'mod/lanebs:get_constructor',
+        'restrictedusers' => 1,
         'enabled' => 1,
-        'shortname' => 'Constructor',
+        'shortname' => 'LanConstructor',
         'downloadfiles' => 0,
         'uploadfiles' => 0,
     ),
@@ -99,6 +99,7 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
     ),
     'mod_lanebs_get_service_token' => array(
         'classname' => 'mod_lanebs_constructor_external',
@@ -108,6 +109,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
     ),
     'mod_lanebs_get_subscriber_token' => array(
         'classname' => 'mod_lanebs_constructor_external',
@@ -117,6 +119,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
     ),
     'mod_lanebs_get_reader_token' => array(
         'classname' => 'mod_lanebs_constructor_external',
@@ -126,6 +129,7 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
     ),
     'mod_lanebs_get_script_names' => array(
         'classname' => 'mod_lanebs_constructor_external',
@@ -135,5 +139,36 @@ $functions = array(
         'type' => 'read',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_video_stat' => array(
+        'classname' => 'mod_lanebs_external',
+        'methodname' => 'video_stat',
+        'classpath' => 'mod/lanebs/externallib.php',
+        'description' => 'Send video stat',
+        'type' => 'read',
+        'ajax' => true,
+        'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_tree',
+    ),
+    'mod_lanebs_create_mod_quiz' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'create_mod_quiz',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Create mod_quiz',
+        'type' => 'read',
+        'ajax' => true,
+        'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
+    ),
+    'mod_lanebs_send_log' => array(
+        'classname' => 'mod_lanebs_constructor_external',
+        'methodname' => 'send_log',
+        'classpath' => 'mod/lanebs/constructor_externallib.php',
+        'description' => 'Send log to C',
+        'type' => 'read',
+        'ajax' => true,
+        'service' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        'capabilities' => 'lanebs:get_constructor',
     ),
 );

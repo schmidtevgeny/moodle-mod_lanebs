@@ -37,10 +37,6 @@ $params = array(
     'context' => $coursecontext
 );
 
-$event = \mod_lanebs\event\course_module_instance_list_viewed::create($params);
-$event->add_record_snapshot('course', $course);
-$event->trigger();
-
 $PAGE->set_url('/mod/lanebs/index.php', array('id' => $id));
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
@@ -50,6 +46,8 @@ echo $OUTPUT->header();
 
 $modulenameplural = get_string('modulenameplural', 'mod_lanebs');
 echo $OUTPUT->heading($modulenameplural);
+
+\mod_lanebs\event\course_module_instance_list_viewed::create_from_course($course)->trigger();
 
 $lanebss = get_all_instances_in_course('lanebs', $course);
 

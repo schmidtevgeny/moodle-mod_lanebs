@@ -27,7 +27,7 @@ define([
         SUBMIT_BUTTON: "[data-action='submit_button']",
         OPEN_BUTTON: "#id_modal_video_button",
         OPEN_BUTTON_CONTAINER: "#id_modal_video_button",
-        CANCEL_BUTTON: "[data-action='cancel_button']",
+        CANCEL_BUTTON: "[data-action='close_button']",
         CONTENT_BLOCK: "[data-action='video_content_block']",
         CLOSE_CROSS: ".close",
         ROOT_MODAL: "[data-region='modal-container']",
@@ -50,9 +50,6 @@ define([
     let ModalVideo = function(root) {
         Modal.call(this, root);
         ModalVideo.prototype.modal = this;
-        if (!this.getFooter().find(SELECTORS.CANCEL_BUTTON).length) {
-            Notification.exception({message: Str.get_string('lanebs_error_close', 'mod_lanebs')});
-        }
         this.printTocs();
     };
 
@@ -66,90 +63,98 @@ define([
 
         this.getModal().on(CustomEvents.events.activate, SELECTORS.SUBMIT_BUTTON, ModalVideo.prototype.updateVideoField);
 
-        this.getModal().on(CustomEvents.events.activate, SELECTORS.CANCEL_BUTTON, function () {
-            $(this).trigger('hide');
+        this.getRoot().on(CustomEvents.events.activate, SELECTORS.CANCEL_BUTTON+', '+SELECTORS.CLOSE_CROSS, function () {
+            this.destroy();
+            this.getBackdrop().then(function (backdrop) {
+                backdrop.hide();
+            });
         }.bind(this));
-
+/*        this.getModal().on(CustomEvents.events.activate, SELECTORS.CANCEL_BUTTON, function () {
+            $(this).trigger('hide');
+        }.bind(this));*/
     };
 
     ModalVideo.prototype.printTocs = function () {
-        let tocArgs = {
-            id: $(SELECTORS.BOOK_ID_SELECTOR).val(),
-            page: 0
-        };
-        ModalVideo.prototype.getAjaxCall('mod_lanebs_toc_name', tocArgs, function (tocs) {
-            let videosArgs = {
-                id: $(SELECTORS.BOOK_ID_SELECTOR).val()
+        let bookId = $(SELECTORS.BOOK_ID_SELECTOR).val();
+        if (bookId !== '') {
+            let tocArgs = {
+                id: bookId,
+                page: 0
             };
-            ModalVideo.prototype.getAjaxCall('mod_lanebs_toc_videos', videosArgs, function(videos) {
-                let body = ModalVideo.prototype.modal.getBody();
-                let innerTocHtml = '';
-                let issetTocVideo = [];
-                let BreakException = {};
-                if (tocs) {
-                    tocs.forEach(function (value, index) {
-                        let videosList = '<ul class="modal_video">';
-                        let currentPage = value['page'];
-                        issetTocVideo[index] = false;
-                        let uniqueIndex;
-                        try {
-                            videos.forEach(function (video, videoIndex) {
-                                if (video['start_page'] === currentPage) {
-                                    issetTocVideo[index] = true;
-                                    uniqueIndex = video['unique_id'] + '_' + index;
-                                    videosList +=
-                                        '<li class="modal_video">' +
-                                        '<label for="video_' + uniqueIndex + '" class="modal_video">' +
-                                        '<p class="modal_video">' +
-                                        '<input type="checkbox" data-unique="' + uniqueIndex + '" class="modal_video" id="video_' + uniqueIndex + '" data-url="' + video['link_url'] + '" />' +
-                                        video['link_name'] +
-                                        '</p>' +
-                                        '<img src="' + ModalVideo.prototype.getYoutubePreview(video['link_url']) + '" alt="' + video['link_name'] + '" class="modal_video" data-id="' + ModalVideo.prototype.getYoutubeId(video['link_url']) + '" />' +
-                                        '<div class="video_play_hover"></div>' +
-                                        '</label>' +
-                                        '</li>';
-                                } else if (video['start_page'] === '-1') {
-                                    issetTocVideo[index] = undefined;
-                                    $(SELECTORS.OPEN_BUTTON_CONTAINER).closest('.form-group').addClass('hidden');
-                                    throw BreakException;
-                                }
-                            });
-                        } catch (e) {
-                            if (e !== BreakException) throw e;
-                        }
-                        videosList += '</ul>';
-                        if (issetTocVideo[index] === true) {
-                            innerTocHtml +=
-                                '<div class="item-toc" style="margin-bottom:10px;" data-page="' + currentPage + '">' +
-                                '<span>' + value['title'] + ', ' + ModalVideo.prototype.strings['lanebs_read_pg'] + '. ' + value['page'] + '</span><br>' +
-                                '<a class="" data-toggle="collapse" href="#collapseDescription_' + currentPage + '_' + index + '" role="button">' +
-                                'Видео-рекомендации' +
-                                '</a>' +
-                                '<div class="collapse" id="collapseDescription_' + currentPage + '_' + index + '">' + videosList + '</div>' +
-                                '</div>';
-                        }
-                    });
-                }
-                if (issetTocVideo[0] !== undefined) {
-                    $(SELECTORS.OPEN_BUTTON_CONTAINER).closest('.form-group').removeClass('hidden');
-                    body.find(SELECTORS.DATA_TOC).html(innerTocHtml);
-                    $(body.find(SELECTORS.TRIGGER_PLAYER)).on('click', function (e) {
-                        let linkId = $(e.target).attr('data-id');
-                        ModalPlayerHandle.init(e, linkId);
-                    });
-                    $(body.find(SELECTORS.PLAY_BUTTON_HOVER)).on('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        $(e.currentTarget).siblings(SELECTORS.TRIGGER_PLAYER).trigger('click');
-                    });
-                }
-                let issetVideos = ModalVideo.prototype.getIssetVideos();
-                if (issetVideos) {
-                    ModalVideo.prototype.printVideos(issetVideos);
-                    ModalVideo.prototype.preCheckVideos(issetVideos);
-                }
+            ModalVideo.prototype.getAjaxCall('mod_lanebs_toc_name', tocArgs, function (tocs) {
+                let videosArgs = {
+                    id: $(SELECTORS.BOOK_ID_SELECTOR).val()
+                };
+                ModalVideo.prototype.getAjaxCall('mod_lanebs_toc_videos', videosArgs, function (videos) {
+                    let body = ModalVideo.prototype.modal.getBody();
+                    let innerTocHtml = '';
+                    let issetTocVideo = [];
+                    let BreakException = {};
+                    if (tocs) {
+                        tocs.forEach(function (value, index) {
+                            let videosList = '<ul class="modal_video">';
+                            let currentPage = value['page'];
+                            issetTocVideo[index] = false;
+                            let uniqueIndex;
+                            try {
+                                videos.forEach(function (video, videoIndex) {
+                                    if (video['start_page'] === currentPage) {
+                                        issetTocVideo[index] = true;
+                                        uniqueIndex = video['unique_id'] + '_' + index;
+                                        videosList +=
+                                            '<li class="modal_video">' +
+                                            '<label for="video_' + uniqueIndex + '" class="modal_video">' +
+                                            '<p class="modal_video">' +
+                                            '<input type="checkbox" data-unique="' + uniqueIndex + '" class="modal_video" id="video_' + uniqueIndex + '" data-url="' + video['link_url'] + '" />' +
+                                            video['link_name'] +
+                                            '</p>' +
+                                            '<img src="' + ModalVideo.prototype.getYoutubePreview(video['link_url']) + '" alt="' + video['link_name'] + '" class="modal_video" data-id="' + ModalVideo.prototype.getYoutubeId(video['link_url']) + '" />' +
+                                            '<div class="video_play_hover"></div>' +
+                                            '</label>' +
+                                            '</li>';
+                                    } else if (video['start_page'] === '-1') {
+                                        issetTocVideo[index] = undefined;
+                                        $(SELECTORS.OPEN_BUTTON_CONTAINER).closest('.form-group').addClass('hidden');
+                                        throw BreakException;
+                                    }
+                                });
+                            } catch (e) {
+                                if (e !== BreakException) throw e;
+                            }
+                            videosList += '</ul>';
+                            if (issetTocVideo[index] === true) {
+                                innerTocHtml +=
+                                    '<div class="item-toc" style="margin-bottom:10px;" data-page="' + currentPage + '">' +
+                                    '<span>' + value['title'] + ', ' + ModalVideo.prototype.strings['lanebs_read_pg'] + '. ' + value['page'] + '</span><br>' +
+                                    '<a class="" data-toggle="collapse" href="#collapseDescription_' + currentPage + '_' + index + '" role="button">' +
+                                    'Видео-рекомендации' +
+                                    '</a>' +
+                                    '<div class="collapse" id="collapseDescription_' + currentPage + '_' + index + '">' + videosList + '</div>' +
+                                    '</div>';
+                            }
+                        });
+                    }
+                    if (issetTocVideo[0] !== undefined) {
+                        $(SELECTORS.OPEN_BUTTON_CONTAINER).closest('.form-group').removeClass('hidden');
+                        body.find(SELECTORS.DATA_TOC).html(innerTocHtml);
+                        $(body.find(SELECTORS.TRIGGER_PLAYER)).on('click', function (e) {
+                            let linkId = $(e.target).attr('data-id');
+                            ModalPlayerHandle.init(e, linkId);
+                        });
+                        $(body.find(SELECTORS.PLAY_BUTTON_HOVER)).on('click', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $(e.currentTarget).siblings(SELECTORS.TRIGGER_PLAYER).trigger('click');
+                        });
+                    }
+                    let issetVideos = ModalVideo.prototype.getIssetVideos();
+                    if (issetVideos) {
+                        ModalVideo.prototype.printVideos(issetVideos);
+                        ModalVideo.prototype.preCheckVideos(issetVideos);
+                    }
+                });
             });
-        });
+        }
     };
 
     ModalVideo.prototype.getAjaxCall = function (methodname, args, callback) {

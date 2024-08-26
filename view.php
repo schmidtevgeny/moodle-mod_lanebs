@@ -36,21 +36,18 @@ if ($id) {
     $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $moduleinstance = $DB->get_record('lanebs', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($l) {
-    $moduleinstance = $DB->get_record('lanebs', array('id' => $n), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('lanebs', array('id' => $l), '*', MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
     $cm             = get_coursemodule_from_instance('lanebs', $moduleinstance->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error(get_string('missingidandcmid', 'mod_lanebs'));
+    throw new moodle_exception('missingidandcmid', 'mod_lanebs');
 }
 
 require_login($course, true, $cm);
 
 $modulecontext = context_module::instance($cm->id);
 
-$event = \mod_lanebs\event\course_module_viewed::create(array(
-    'objectid' => $moduleinstance->id,
-    'context' => $modulecontext
-));
+$event = \mod_lanebs\event\course_module_viewed::create_from_lanebs($moduleinstance, $modulecontext);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('lanebs', $moduleinstance);
 $event->trigger();
@@ -72,6 +69,20 @@ $PAGE->requires->js_call_amd('mod_lanebs/view_button', 'init', array('id' => $mo
 
 $PAGE->requires->js_call_amd('mod_lanebs/player_button', 'init');
 
+$creator = get_course_creator($course->id);
+if ($creator) {
+    $PAGE->requires->js_call_amd('mod_lanebs/log', 'init', array(
+            'type' => $moduleinstance->type,
+            'resourceid' => $moduleinstance->content,
+            'coursename' => $course->shortname,
+            'email' => $creator->email,
+            'fio' => fullname($creator),
+            'trigger' => $USER->email,
+            'course_date' => $creator->course_date
+        )
+    );
+}
+
 $PAGE->set_url('/mod/lanebs/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -83,7 +94,7 @@ $videosBlock = '';
 if (!empty($videos)) {
     $videosBlock = '<div class="row"></div>';
     foreach ($videos as $video) {
-        $videosBlock .= '<div class="video row"><p data-action="player_modal" style="color:#4285f4;cursor:pointer;" data-id="'.$video->video_id.'"><u>'.$video->name.'</u></p></div>';
+        $videosBlock .= '<div class="video row"><p data-action="player_modal" style="color:#4285f4;cursor:pointer;" data-book="'.($video->book_id ? $video->book_id : '').'" data-unique="'.$video->unique.'" data-id="'.$video->video_id.'"><u>'.$video->name.'</u></p></div>';
     }
 }
 
