@@ -24,13 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__ . '/external_fork.php';
-
 require_once($CFG->dirroot . "/webservice/lib.php");
 require_once($CFG->libdir . "/filelib.php");
 require_once(__DIR__ . '/lib.php');
 
-class mod_lanebs_external extends \external_api
+class mod_lanebs_external extends \core_external\external_api
 {
 
     private static $subscribeToken = false;
@@ -41,22 +39,22 @@ class mod_lanebs_external extends \external_api
     /**
      * Return category_tree webservice parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
     public static function search_books_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'searchParam' => new external_single_structure(
+                'searchParam' => new \core_external\external_single_structure(
                     array(
-                        'searchString'  => new external_value(PARAM_TEXT, 'Search string'),
-                        'bookFilter' => new external_value(PARAM_TEXT, 'Search detail'),
-                        'eduFilter' => new external_value(PARAM_TEXT, 'Filter by education category'),
+                        'searchString'  => new \core_external\external_value(PARAM_TEXT, 'Search string'),
+                        'bookFilter' => new \core_external\external_value(PARAM_TEXT, 'Search detail'),
+                        'eduFilter' => new \core_external\external_value(PARAM_TEXT, 'Filter by education category'),
                     )
                 ),
-                'page'        => new external_value(PARAM_INT, 'search page'),
-                'limit'       => new external_value(PARAM_INT, 'element count by page'),
-                'catId'       => new external_value(PARAM_RAW, 'category ID'),
+                'page'        => new \core_external\external_value(PARAM_INT, 'search page'),
+                'limit'       => new \core_external\external_value(PARAM_INT, 'element count by page'),
+                'catId'       => new \core_external\external_value(PARAM_RAW, 'category ID'),
             )
         );
     }
@@ -101,10 +99,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_VERBOSE' => true);
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-                array('x-auth-token-subscriber: '.self::$subscribeToken,
-                    'Authorization: Bearer '.self::$readerToken)
-            )
+        $curl->setopt(['CURLOPT_HTTPHEADER' =>
+                ['x-auth-token-subscriber: '.self::$subscribeToken,
+                    'Authorization: Bearer '.self::$readerToken]
+            ]
         );
         $data = $curl->get($url, $params, $options);
         return array(
@@ -114,12 +112,12 @@ class mod_lanebs_external extends \external_api
 
     /**
      *
-     * @return \external_single_structure
+     * @return \\core_external\external_single_structure
      */
     public static function search_books_returns() {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Search string'),
+                'body' => new \core_external\external_value(PARAM_RAW, 'Search string'),
             )
         );
     }
@@ -139,10 +137,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-                array('x-auth-token-subscriber: '.self::$subscribeToken,
-                'Authorization: Bearer '.self::$readerToken)
-            )
+        $curl->setopt([ 'CURLOPT_HTTPHEADER' =>
+                ['x-auth-token-subscriber: '.self::$subscribeToken,
+                    'Authorization: Bearer '.self::$readerToken]
+            ]
         );
         //$readerUrl = get_lanebs_config('reader_url'). '/old/book/'. $id . '?moodle=1';
         return array(
@@ -152,28 +150,28 @@ class mod_lanebs_external extends \external_api
 
     public static function book_content_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'id' => new external_value(PARAM_TEXT, 'book ID'),
-                'mobile' => new external_value(PARAM_BOOL, 'Do you need a mobile reader')
+                'id' => new \core_external\external_value(PARAM_TEXT, 'book ID'),
+                'mobile' => new \core_external\external_value(PARAM_BOOL, 'Do you need a mobile reader')
             )
         );
     }
 
     public static function book_content_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'raw HTML for reader'),
+                'body' => new \core_external\external_value(PARAM_RAW, 'raw HTML for reader'),
             )
         );
     }
 
     public static function category_tree_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'categoryId' => new external_single_structure(array(new external_value(PARAM_TEXT, 'book ID'))
+                'categoryId' => new \core_external\external_single_structure(array(new \core_external\external_value(PARAM_TEXT, 'book ID'))
                 )
             )
         );
@@ -195,10 +193,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-                array('x-auth-token-subscriber: '.self::$subscribeToken,
-                    'Authorization: Bearer '.self::$readerToken)
-            )
+        $curl->setopt([ 'CURLOPT_HTTPHEADER' =>
+                ['x-auth-token-subscriber: '.self::$subscribeToken,
+                    'Authorization: Bearer '.self::$readerToken]
+            ]
         );
         $categoryId = $categoryId[0];
         $baseUrl = get_lanebs_config('moodle_api');
@@ -216,16 +214,16 @@ class mod_lanebs_external extends \external_api
 
     public static function category_tree_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'upper category'),
+                'body' => new \core_external\external_value(PARAM_RAW, 'upper category'),
             )
         );
     }
 
     public static function auth_parameters()
     {
-        return new external_function_parameters(array());
+        return new \core_external\external_function_parameters([]);
     }
 
     public static function auth()
@@ -241,10 +239,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
             'CURLOPT_TIMEOUT'           => 5);
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-            array(
+        $curl->setopt(['CURLOPT_HTTPHEADER' =>
+            [
                 'x-auth-token-subscriber: '.self::$subscribeToken,
-            )));
+            ]]);
         $authUrl = get_lanebs_config('auth_url').self::$authUrl;
         $data = $curl->get($authUrl, null, $options);
         $data = json_decode($data);
@@ -260,19 +258,19 @@ class mod_lanebs_external extends \external_api
 
     public static function auth_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'reader token')
+                'body' => new \core_external\external_value(PARAM_RAW, 'reader token')
             )
         );
     }
 
     public static function lanebs_info_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'id' => new external_value(PARAM_INT, 'lanebs module ID')
-                )
+                'id' => new \core_external\external_value(PARAM_INT, 'lanebs module ID')
+            )
         );
     }
 
@@ -294,7 +292,7 @@ class mod_lanebs_external extends \external_api
             $info->completition = $instance->completition;
             $info->completitionexpected = $instance->completitionexpected;
             try {
-                return array('body' => json_encode($info));
+                return array('body' => json_encode($info, JSON_THROW_ON_ERROR));
             } catch (JsonException $e) {
                 return array('body' => 'Error json_encode: ' . $e->getMessage());
             }
@@ -303,19 +301,19 @@ class mod_lanebs_external extends \external_api
 
     public static function lanebs_info_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'lanebs module object from database'),
+                'body' => new \core_external\external_value(PARAM_RAW, 'lanebs module object from database'),
             )
         );
     }
 
     public static function toc_name_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'id' => new external_value(PARAM_INT, 'book ID'),
-                'page' => new external_value(PARAM_INT, 'page number'),
+                'id' => new \core_external\external_value(PARAM_INT, 'book ID'),
+                'page' => new \core_external\external_value(PARAM_INT, 'page number'),
             )
         );
     }
@@ -335,10 +333,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-                array('x-auth-token-subscriber: '.self::$subscribeToken,
-                    'Authorization: Bearer '.self::$readerToken)
-            )
+        $curl->setopt([ 'CURLOPT_HTTPHEADER' =>
+                ['x-auth-token-subscriber: '.self::$subscribeToken,
+                    'Authorization: Bearer '.self::$readerToken]
+            ]
         );
         $readerUrl = get_lanebs_config('moodle_api') . '/api/book/'. $id . '/toc';
         $data = $curl->get($readerUrl, null, $options);
@@ -347,7 +345,7 @@ class mod_lanebs_external extends \external_api
         if ($page !== 0) {
             $tocs = $items->body->items;
             usort($tocs, function ($toc1, $toc2) {
-                return $toc1->page <= $toc2->page;
+                return $toc1->page <=> $toc2->page;
             });
             foreach ($tocs as $tocId => $item) {
                 if ($page === (int)$item->page) {
@@ -375,18 +373,18 @@ class mod_lanebs_external extends \external_api
 
     public static function toc_name_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Needed TOC name')
+                'body' => new \core_external\external_value(PARAM_RAW, 'Needed TOC name')
             )
         );
     }
 
     public static function toc_videos_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'id' => new external_value(PARAM_INT, 'book ID'),
+                'id' => new \core_external\external_value(PARAM_INT, 'book ID'),
             )
         );
     }
@@ -406,10 +404,10 @@ class mod_lanebs_external extends \external_api
             'CURLOPT_RETURNTRANSFER'    => true,
             'CURLOPT_USERAGENT'         => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' =>
-                array('x-auth-token-subscriber: '.self::$subscribeToken,
-                    'Authorization: Bearer '.self::$readerToken)
-            )
+        $curl->setopt([ 'CURLOPT_HTTPHEADER' =>
+                ['x-auth-token-subscriber: '.self::$subscribeToken,
+                    'Authorization: Bearer '.self::$readerToken]
+            ]
         );
         $readerUrl = get_lanebs_config('moodle_api') . '/api/book/'. $id . '/seealso';
         $data = $curl->get($readerUrl, null, $options);
@@ -433,18 +431,18 @@ class mod_lanebs_external extends \external_api
 
     public static function toc_videos_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Needed TOC videos')
+                'body' => new \core_external\external_value(PARAM_RAW, 'Needed TOC videos')
             )
         );
     }
 
     public static function video_stat_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'result')
+                'body' => new \core_external\external_value(PARAM_RAW, 'result')
             )
         );
     }
@@ -476,10 +474,10 @@ class mod_lanebs_external extends \external_api
 
     public static function video_stat_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'bookId' => new external_value(PARAM_TEXT, 'Book ID'),
-                'videoId' => new external_value(PARAM_TEXT, 'Video ID'),
+                'bookId' => new \core_external\external_value(PARAM_TEXT, 'Book ID'),
+                'videoId' => new \core_external\external_value(PARAM_TEXT, 'Video ID'),
             )
         );
     }

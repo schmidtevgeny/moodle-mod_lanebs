@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_lanebs';
-$plugin->release = '1.3.13';
-$plugin->version = 2024012829;
-$plugin->requires = 2015111600;
+$plugin->release = '1.4.7';
+$plugin->version = 2024012824;
+$plugin->requires = 2023100900;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->base_url = 'https://c.lanbook.com';
 $plugin->auth_url = 'https://security.lanbook.com';

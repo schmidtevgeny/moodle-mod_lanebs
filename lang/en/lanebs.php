@@ -25,7 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['ru'] = '';
 $string['pluginname'] = 'Integration with ELS Lan';
 $string['modulename'] = 'Integration with ELS Lan';
 $string['modulename_help'] = 'The plugin allows you to seamlessly integrate educational content from EBS Lan (links to textbook pages, videos) into electronic courses. Using the Plugin optimizes the time for developing electronic courses, expands the teacher’s capabilities, involves students in studying the material, and thereby increases the efficiency of learning in the electronic educational environment.';
@@ -102,3 +101,4 @@ $string['token_desc'] = 'Subscriber token for reader access';
 $string['lan_constructor'] = 'Lan Constructor';
 $string['privacy:metadata'] = 'The LANEBS module does not store any personal data';
 $string['lanebs_role'] = 'WS Role for Lan Constructor';
+$string['lanebs_title'] = 'EBS Lan Constructor';

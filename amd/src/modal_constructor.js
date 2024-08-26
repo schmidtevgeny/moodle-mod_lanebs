@@ -1,72 +1,63 @@
-define([
-    "exports",
-    "jquery",
-    "core/ajax",
-    "core/modal_factory",
-    "core/modal_events",
-    "core/notification",
-    "core/modal",
-    "core/custom_interaction_events",
-    "core/modal_registry",
-], function (
-    exports,
-    $,
-    ajax,
-    ModalFactory,
-    ModalEvents,
-    Notification,
-    Modal,
-    CustomEvents,
-    ModalRegistry,
-) {
+import ajax from 'core/ajax';
+import Modal from 'core/modal';
+import CustomEvents from 'core/custom_interaction_events';
 
-    /**
-     * Constructor for the Modal
-     *
-     */
-    let ModalConstructor = function(root) {
-        Modal.call(this, root);
-    };
-
-    ModalConstructor.TYPE = 'mod_lanebs_constructor';
-    ModalConstructor.prototype = Object.create(Modal.prototype);
-    ModalConstructor.prototype.constructor = ModalConstructor;
-    ModalConstructor.prototype.breadcrumbs = {};
-    ModalConstructor.SCRIPT_BUTTON = '#script_button';
-
-    let SELECTORS = {
+export default class ModalConstructor extends Modal {
+    static TYPE = 'mod_lanebs/modal_constructor';
+    static TEMPLATE = 'mod_lanebs/modal_constructor';
+    static SELECTORS = {
         'SCRIPT_BUTTON': '#script_button',
         'APP_CONTAINER': 'div#app_container',
+        'CLOSE_CROSS': '.close',
     };
+    static breadcrumbs = {};
 
-    ModalConstructor.prototype.registerEventListeners = function () {
-        Modal.prototype.registerEventListeners.call(this);
+    configure(modalConfig) {
+        super.configure(modalConfig);
+    }
 
-        this.getRoot().on(ModalEvents.hidden, function () {
-            this.destroy();
-        }.bind(this));
+    registerEventListeners() {
+        const modal = this;
+        this.getRoot().on(CustomEvents.events.hidden, function () {
+            modal.destroy();
+        });
+        this.getRoot().on(CustomEvents.events.activate, ModalConstructor.SELECTORS.CLOSE_CROSS,
+            function () {
+                modal.destroy();
+            });
+    }
 
-    };
-
-    ModalConstructor.prototype.getAjaxCall = function (methodname, args, callback) {
+    static getAjaxCall(methodname, args, callback) {
         return ajax.call([
             {
                 methodname: methodname,
                 args,
             }
         ])[0].then(function(response) {
-            return response;
-        }).done(function(response) {
             callback(JSON.parse(response['body']));
             return true;
         }).fail(function (response) {
-            console.log(response);
+            window.console.log(response);
             callback({'error': true, 'code': 500, 'message': 'error'});
             return false;
         });
-    };
+    }
 
-    ModalRegistry.register(ModalConstructor.TYPE, ModalConstructor, 'mod_lanebs/modal_constructor');
+    static appendScript(container, src) {
+        let script = document.createElement('script');
+        script.src = src;
+        script.type = 'text/javascript';
+        script.defer = true;
 
-    return ModalConstructor;
-});
+        container.appendChild(script);
+    }
+
+    static appendHeadStylesheet(href) {
+        let script = document.createElement('link');
+        script.type = 'text/css';
+        script.rel = 'stylesheet';
+        script.href = href;
+
+        document.head.appendChild(script);
+    }
+}

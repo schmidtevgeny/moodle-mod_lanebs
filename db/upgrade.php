@@ -71,7 +71,7 @@ function xmldb_lanebs_upgrade($oldversion) {
         upgrade_plugin_savepoint(true,  2022090625, 'mod', 'lanebs');
     }
 
-    /*if ($oldversion <= 2023111122) {
+    if ($oldversion <= 2023111122) {
         $wsName = 'ws-lanconstructor-role';
         $wsroleId = $DB->get_record('role', array('shortname' => $wsName));
         if (!empty($wsroleId)) {
@@ -81,7 +81,7 @@ function xmldb_lanebs_upgrade($oldversion) {
             assign_capability('moodle/question:managecategory', CAP_ALLOW, $wsroleId->id, $systemContext->id, true);
             //role_assign($wsroleId->id, $webserviceUser->id, $systemContext->id);
         }
-    }*/
+    }
 
     return true;
 }

@@ -30,6 +30,7 @@ if ($ADMIN->fulltree) {
     global $PAGE;
    // TODO: Define the plugin settings page.
    // https://docs.moodle.org/dev/Admin_settings
+
     $settings->add(new admin_setting_configtext('lanebs/token',
         get_string('lanebs:token', 'mod_lanebs'),
         get_string('lanebs:token_desc', 'mod_lanebs'), ''));

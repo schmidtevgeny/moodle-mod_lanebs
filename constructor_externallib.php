@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__ . '/external_fork.php';
-
 require_once($CFG->dirroot . '/webservice/lib.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
@@ -33,7 +31,7 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once(__DIR__ . '/lib.php');
 
-class mod_lanebs_constructor_external extends \external_api
+class mod_lanebs_constructor_external extends \core_external\external_api
 {
 
     const SERVICE_NAME = 'lan_constructor_service';
@@ -51,62 +49,67 @@ class mod_lanebs_constructor_external extends \external_api
     public static $journalFolder = 'Статьи по теме';
     public static $videoFolder = 'Видеоматериалы по теме';
     public static $testingFolder = 'Тестирование по теме';
+    const ALLOWED_TYPES = array(
+        self::BOOK_TYPE,
+        self::JOURNAL_TYPE,
+        self::VIDEO_TYPE
+    );
 
     public static function create_mod_lanebs_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'courseData' => new external_single_structure(
+                'courseData' => new \core_external\external_single_structure(
                     array(
-                        'course' => new external_value(PARAM_INT, 'Course id'),
-                        'section' => new external_value(PARAM_INT, 'Section number'),
-                        'search' => new external_value(PARAM_TEXT, 'String of search', VALUE_OPTIONAL),
+                        'course' => new \core_external\external_value(PARAM_INT, 'Course id'),
+                        'section' => new \core_external\external_value(PARAM_INT, 'Section number'),
+                        'search' => new \core_external\external_value(PARAM_TEXT, 'String of search', VALUE_OPTIONAL),
                     )
                 ),
-                'resourceData' => new external_single_structure(
+                'resourceData' => new \core_external\external_single_structure(
                     array(
-                        'book' => new external_multiple_structure(
-                            new external_single_structure(
+                        'book' => new \core_external\external_multiple_structure(
+                            new \core_external\external_single_structure(
                                 array(
-                                    'resourceId' => new external_value(PARAM_INT, 'Resource id in EBS'),
-                                    'resourceName' => new external_value(PARAM_TEXT, 'Resource name'),
-                                    'authorName' => new external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
-                                    'cover' => new external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
-                                    'biblioRecord' => new external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
-                                    'tocName' => new external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
-                                    'pageStart' => new external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
+                                    'resourceId' => new \core_external\external_value(PARAM_INT, 'Resource id in EBS'),
+                                    'resourceName' => new \core_external\external_value(PARAM_TEXT, 'Resource name'),
+                                    'authorName' => new \core_external\external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
+                                    'cover' => new \core_external\external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
+                                    'biblioRecord' => new \core_external\external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
+                                    'tocName' => new \core_external\external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
+                                    'pageStart' => new \core_external\external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
                                 )
                             ), 'books data', VALUE_OPTIONAL
                         ),
-                        'journalArticle' => new external_multiple_structure(
-                            new external_single_structure(
+                        'journalArticle' => new \core_external\external_multiple_structure(
+                            new \core_external\external_single_structure(
                                 array(
-                                    'resourceId' => new external_value(PARAM_INT, 'Resource id in EBS'),
-                                    'resourceName' => new external_value(PARAM_TEXT, 'Resource name'),
-                                    'authorName' => new external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
-                                    'cover' => new external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
-                                    'biblioRecord' => new external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
-                                    'tocName' => new external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
-                                    'pageStart' => new external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
+                                    'resourceId' => new \core_external\external_value(PARAM_INT, 'Resource id in EBS'),
+                                    'resourceName' => new \core_external\external_value(PARAM_TEXT, 'Resource name'),
+                                    'authorName' => new \core_external\external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
+                                    'cover' => new \core_external\external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
+                                    'biblioRecord' => new \core_external\external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
+                                    'tocName' => new \core_external\external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
+                                    'pageStart' => new \core_external\external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
                                 )
                             ), 'journals data', VALUE_OPTIONAL
                         ),
-                        'video' => new external_single_structure(
+                        'video' => new \core_external\external_single_structure(
                             array(
-                                'resourceId' => new external_value(PARAM_INT, 'Resource id in EBS'),
-                                'resourceName' => new external_value(PARAM_TEXT, 'Resource name'),
-                                'authorName' => new external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
-                                'cover' => new external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
-                                'biblioRecord' => new external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
-                                'tocName' => new external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
-                                'pageStart' => new external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
-                                'videosData' => new external_multiple_structure(
-                                    new external_single_structure(
+                                'resourceId' => new \core_external\external_value(PARAM_INT, 'Resource id in EBS'),
+                                'resourceName' => new \core_external\external_value(PARAM_TEXT, 'Resource name'),
+                                'authorName' => new \core_external\external_value(PARAM_TEXT, 'Author name', VALUE_OPTIONAL),
+                                'cover' => new \core_external\external_value(PARAM_TEXT, 'Book cover url', VALUE_OPTIONAL),
+                                'biblioRecord' => new \core_external\external_value(PARAM_TEXT, 'Bibliographical record', VALUE_OPTIONAL),
+                                'tocName' => new \core_external\external_value(PARAM_TEXT, 'Name of the toc', VALUE_OPTIONAL),
+                                'pageStart' => new \core_external\external_value(PARAM_INT, 'Reader page start', VALUE_DEFAULT, 1),
+                                'videosData' => new \core_external\external_multiple_structure(
+                                    new \core_external\external_single_structure(
                                         array(
-                                            'linkName' => new external_value(PARAM_TEXT, 'Name of the video'),
-                                            'linkUrl' => new external_value(PARAM_TEXT, 'Url of the video'),
-                                            'id' => new external_value(PARAM_INT, 'Id of the video'),
-                                            'bookId' => new external_value(PARAM_INT, 'Id of the book'),
+                                            'linkName' => new \core_external\external_value(PARAM_TEXT, 'Name of the video'),
+                                            'linkUrl' => new \core_external\external_value(PARAM_TEXT, 'Url of the video'),
+                                            'id' => new \core_external\external_value(PARAM_INT, 'Id of the video'),
+                                            'bookId' => new \core_external\external_value(PARAM_INT, 'Id of the book'),
                                         )
                                     )
                                 ),
@@ -127,7 +130,7 @@ class mod_lanebs_constructor_external extends \external_api
         if (!$course) {
             $data = array('code' => 404, 'message' => 'Course not found');
             return array(
-                'body' => json_encode($data)
+                'body' => json_encode($data, JSON_THROW_ON_ERROR)
             );
         }
         $lanModule = $DB->get_record('modules', array('name' => self::LANEBS_MODULE));
@@ -147,13 +150,13 @@ class mod_lanebs_constructor_external extends \external_api
                 } catch (dml_exception $e) {
                     $data = array('code' => 500, 'message' => $e->getMessage());
                     return array(
-                        'body' => json_encode($data),
+                        'body' => json_encode($data, JSON_THROW_ON_ERROR),
                     );
                 }
                 foreach ($books as $book) {
                     $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
                     $lanebs->type = self::BOOK_TYPE;
-                    $book['authorName'] = $book['authorName'] ? $book['authorName'] : '';
+                    $book['authorName'] = $book['authorName'] ?? '';
                     $lanebs->name = $book['authorName'] . ' - ' . $book['resourceName'] . ', стр. ' . $book['pageStart'];
                     if (isset($book['tocName']) && !empty($book['tocName'])) {
                         $lanebs->name .= ', ' . $book['tocName'];
@@ -172,7 +175,7 @@ class mod_lanebs_constructor_external extends \external_api
                     } catch (dml_exception $e) {
                         $data = array('code' => 500, 'message' => $e->getMessage());
                         return array(
-                            'body' => json_encode($data),
+                            'body' => json_encode($data, JSON_THROW_ON_ERROR),
                         );
                     }
                 }
@@ -188,13 +191,13 @@ class mod_lanebs_constructor_external extends \external_api
                 } catch (dml_exception $e) {
                     $data = array('code' => 500, 'message' => $e->getMessage());
                     return array(
-                        'body' => json_encode($data),
+                        'body' => json_encode($data, JSON_THROW_ON_ERROR),
                     );
                 }
                 foreach ($journals as $journal) {
                     $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
                     $lanebs->type = self::JOURNAL_TYPE;
-                    $journal['authorName'] = $journal['authorName'] ? $journal['authorName'] : '';
+                    $journal['authorName'] = $journal['authorName'] ?? '';
                     $lanebs->name = $journal['authorName'] . ' - ' . $journal['resourceName'] . ', стр. ' . $journal['pageStart'];
                     if (isset($journal['tocName']) && !empty($journal['tocName'])) {
                         $lanebs->name .= ', ' . $journal['tocName'];
@@ -210,7 +213,7 @@ class mod_lanebs_constructor_external extends \external_api
                     } catch (dml_exception $e) {
                         $data = array('code' => 500, 'message' => $e->getMessage());
                         return array(
-                            'body' => json_encode($data),
+                            'body' => json_encode($data, JSON_THROW_ON_ERROR),
                         );
                     }
                 }
@@ -226,18 +229,18 @@ class mod_lanebs_constructor_external extends \external_api
                 } catch (dml_exception $e) {
                     $data = array('code' => 500, 'message' => $e->getMessage());
                     return array(
-                        'body' => json_encode($data),
+                        'body' => json_encode($data, JSON_THROW_ON_ERROR),
                     );
                 }
             }
             $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
             $lanebs->type = self::VIDEO_TYPE;
             $links = $video['videosData'];
-            $lanebs->content = $video['bookId'] ? $video['bookId'] : ''; // здесь этой инфы нет
+            $lanebs->content = $video['bookId'] ?? ''; // здесь этой инфы нет
             $lanebs->name = self::$videoFolder;
             $lanebs->content_name = $video['resourceName'];
             $lanebs->page_number = 1;
-            $lanebs->biblio_record = $video['biblioRecord'] ? $video['biblioRecord'] : '';
+            $lanebs->biblio_record = $video['biblioRecord'] ?? '';
             $lanebs->cover = '';
             $lanVideo = array();
             foreach ($links as $link) {
@@ -252,50 +255,50 @@ class mod_lanebs_constructor_external extends \external_api
                     'book_id' => $link['bookId']
                 );
             }
-            $lanebs->videos = json_encode($lanVideo);
+            $lanebs->videos = json_encode($lanVideo, JSON_THROW_ON_ERROR);
             try {
                 $data = add_moduleinfo($lanebs, $course);
             } catch (dml_exception $e) {
                 $data = array('code' => 500, 'message' => $e->getMessage());
                 return array(
-                    'body' => json_encode($data),
+                    'body' => json_encode($data, JSON_THROW_ON_ERROR),
                 );
             }
         }
         return array(
-            'body' => json_encode($data)
+            'body' => json_encode($data, JSON_THROW_ON_ERROR)
         );
     }
 
     public static function create_mod_quiz_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with creating result')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with creating result')
+            ),
         );
     }
 
     public static function create_mod_quiz_parameters()
     {
-        return new external_function_parameters(array(
-            'courseData' => new external_single_structure(
+        return new \core_external\external_function_parameters(array(
+            'courseData' => new \core_external\external_single_structure(
                 array(
-                    'course' => new external_value(PARAM_INT, 'Course id'),
-                    'section' => new external_value(PARAM_INT, 'Section number'),
-                    'search' => new external_value(PARAM_TEXT, 'String of search', VALUE_OPTIONAL)
+                    'course' => new \core_external\external_value(PARAM_INT, 'Course id'),
+                    'section' => new \core_external\external_value(PARAM_INT, 'Section number'),
+                    'search' => new \core_external\external_value(PARAM_TEXT, 'String of search', VALUE_OPTIONAL)
                 )
             ),
-            'testData' => new external_multiple_structure(
-                new external_single_structure(
+            'testData' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure(
                     array(
-                        'name' => new external_value(PARAM_TEXT, 'Quiz name'),
-                        'description' => new external_value(PARAM_TEXT, 'Quiz description', VALUE_OPTIONAL),
-                        'random' => new external_value(PARAM_INT, 'Feature of random questions'),
-                        'questions' => new external_value(PARAM_RAW, 'Quiz questions'),
-                        'timeLimit' => new external_value(PARAM_TEXT, 'time limit of test'),
-                        'difficulty' => new external_value(PARAM_TEXT, 'difficulty of test'),
-                        'qCount' => new external_value(PARAM_INT, 'Questions count'),
+                        'name' => new \core_external\external_value(PARAM_TEXT, 'Quiz name'),
+                        'description' => new \core_external\external_value(PARAM_TEXT, 'Quiz description', VALUE_OPTIONAL),
+                        'random' => new \core_external\external_value(PARAM_INT, 'Feature of random questions'),
+                        'questions' => new \core_external\external_value(PARAM_RAW, 'Quiz questions'),
+                        'timeLimit' => new \core_external\external_value(PARAM_TEXT, 'time limit of test'),
+                        'difficulty' => new \core_external\external_value(PARAM_TEXT, 'difficulty of test'),
+                        'qCount' => new \core_external\external_value(PARAM_INT, 'Questions count'),
                     )
                 )
             )
@@ -309,7 +312,7 @@ class mod_lanebs_constructor_external extends \external_api
         if (!$course) {
             $data = array('code' => 404, 'message' => 'Course not found');
             return array(
-                'body' => json_encode($data)
+                'body' => json_encode($data, JSON_THROW_ON_ERROR)
             );
         }
         $quizmodule = $DB->get_record('modules', array('name' => self::QUIZ_MODULE));
@@ -324,7 +327,7 @@ class mod_lanebs_constructor_external extends \external_api
         } catch (dml_exception $e) {
             $data = array('code' => 500, 'message' => $e->getMessage());
             return array(
-                'body' => json_encode($data),
+                'body' => json_encode($data, JSON_THROW_ON_ERROR),
             );
         }
         foreach ($testData as $test) {
@@ -334,7 +337,7 @@ class mod_lanebs_constructor_external extends \external_api
                 $newQuiz = add_moduleinfo($quiz, $course);
                 $quizContext = $DB->get_record('context', array('instanceid' => $newQuiz->coursemodule));
                 $quizContext = context::instance_by_id($quizContext->id);
-                $category = question_make_default_categories(array($quizContext));
+                $category = question_make_default_categories([$quizContext]);
                 $result[] = $newQuiz->id;
                 $filename = random_int(PHP_INT_MIN, PHP_INT_MAX) . $test['name'] . '.xml';
                 file_put_contents($filename, $questions);
@@ -350,28 +353,28 @@ class mod_lanebs_constructor_external extends \external_api
             } catch (dml_exception $e) {
                 $data = array('code' => 500, 'message' => $e->getMessage() . '; ' . $e->getTraceAsString() . '; ' . $e->debuginfo);
                 return array(
-                    'body' => json_encode($data),
+                    'body' => json_encode($data, JSON_THROW_ON_ERROR),
                 );
             }
             unlink($filename);
         }
         return array(
-            'body' => json_encode($result),
+            'body' => json_encode($result, JSON_THROW_ON_ERROR),
         );
     }
 
     public static function create_mod_lanebs_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 
     public static function get_service_token_parameters()
     {
-        return new external_function_parameters(array());
+        return new \core_external\external_function_parameters(array());
     }
 
     public static function get_service_token()
@@ -404,21 +407,21 @@ class mod_lanebs_constructor_external extends \external_api
             $data['message'] = 'Service lan_constructor_service is gone';
         }
         install_permissions();
-        return array('body' => json_encode($data));
+        return array('body' => json_encode($data, JSON_THROW_ON_ERROR));
     }
 
     public static function get_service_token_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 
     public static function get_subscriber_token_parameters()
     {
-        return new external_function_parameters(array());
+        return new \core_external\external_function_parameters(array());
     }
 
     public static function get_subscriber_token()
@@ -426,27 +429,27 @@ class mod_lanebs_constructor_external extends \external_api
         $settings = get_config("lanebs");
         if (isset($settings->token) && !empty($settings->token)) {
             $data = array('error' => false, 'code' => 200, 'subscriber_token' => $settings->token);
-            return array('body' => json_encode($data));
+            return array('body' => json_encode($data, JSON_THROW_ON_ERROR));
         }
         $data = array('error' => true, 'code' => 404, 'message' => 'Token not found');
-        return array('body' => json_encode($data));
+        return array('body' => json_encode($data, JSON_THROW_ON_ERROR));
     }
 
     public static function get_subscriber_token_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 
     public static function get_reader_token_parameters()
     {
-        return new external_function_parameters(
+        return new \core_external\external_function_parameters(
             array(
-                'subscriber_token' => new external_value(PARAM_TEXT, 'subscriber token from lanebs'),
-            )
+                'subscriber_token' => new \core_external\external_value(PARAM_TEXT, 'subscriber token from lanebs'),
+            ),
         );
     }
 
@@ -459,13 +462,13 @@ class mod_lanebs_constructor_external extends \external_api
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_USERAGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36');
         $curl->setopt($options);
-        $curl->setopt(array('CURLOPT_HTTPHEADER' => array('x-auth-token-subscriber: ' . $subscriberToken)));
+        $curl->setopt(['CURLOPT_HTTPHEADER' => ['x-auth-token-subscriber: ' . $subscriberToken]]);
         $authUrl = get_lanebs_config('auth_url').self::AUTH_URL;
         $data = $curl->get($authUrl, null, $options);
-        $data = json_decode($data, true, 512);
+        $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
         if (!$data['jwt'] || !$data['jwt']['access_token']) {
             $returns = array('error' => true, 'code' => 403, 'message' => 'Access Denied');
-            return array(json_encode($returns));
+            return array(json_encode($returns, JSON_THROW_ON_ERROR));
         }
         $returns = array('error' => false, 'code' => 200, 'reader_token' => $data['jwt']['access_token']);
         return array('body' => json_encode($returns));
@@ -473,16 +476,16 @@ class mod_lanebs_constructor_external extends \external_api
 
     public static function get_reader_token_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 
     public static function get_script_names_parameters()
     {
-        return new external_function_parameters(array());
+        return new \core_external\external_function_parameters(array());
     }
 
     public static function get_script_names()
@@ -501,7 +504,7 @@ class mod_lanebs_constructor_external extends \external_api
         );
         $data = $curl->get($scriptUrl, $params, $options);
         try {
-            $scripts = json_decode($data, true, 512);
+            $scripts = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
             $returns = array('error' => false, 'code' => 200, 'scripts' => $scripts, 'raw_data' => $data);
         } catch (\Exception $e) {
             $returns = array('error' => true, 'code' => 500, 'message' => $data);
@@ -511,25 +514,25 @@ class mod_lanebs_constructor_external extends \external_api
 
     public static function get_script_names_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 
     public static function send_log_parameters()
     {
-        return new external_function_parameters(array(
-            'data' => new external_single_structure(
+        return new \core_external\external_function_parameters(array(
+            'data' => new \core_external\external_single_structure(
                 array(
-                    'resourceid' => new external_value(PARAM_TEXT, 'Identifier of content type'),
-                    'type' => new external_value(PARAM_TEXT, 'Type of log'),
-                    'coursename' => new external_value(PARAM_TEXT, 'Course shortname'),
-                    'email' => new external_value(PARAM_TEXT, 'Course owner email'),
-                    'fio' => new external_value(PARAM_TEXT, 'Course owner fio'),
-                    'trigger' => new external_value(PARAM_TEXT, 'Email a person who triggered log sending'),
-                    'course_date' => new external_value(PARAM_TEXT, 'Date of course creating')
+                    'resourceid' => new \core_external\external_value(PARAM_TEXT, 'Identifier of content type'),
+                    'type' => new \core_external\external_value(PARAM_TEXT, 'Type of log'),
+                    'coursename' => new \core_external\external_value(PARAM_TEXT, 'Course shortname'),
+                    'email' => new \core_external\external_value(PARAM_TEXT, 'Course owner email'),
+                    'fio' => new \core_external\external_value(PARAM_TEXT, 'Course owner fio'),
+                    'trigger' => new \core_external\external_value(PARAM_TEXT, 'Email a person who triggered log sending'),
+                    'course_date' => new \core_external\external_value(PARAM_TEXT, 'Date of course creating')
                 )
             )
         ));
@@ -543,10 +546,10 @@ class mod_lanebs_constructor_external extends \external_api
 
     public static function send_log_returns()
     {
-        return new external_single_structure(
+        return new \core_external\external_single_structure(
             array(
-                'body' => new external_value(PARAM_RAW, 'Json with data and errors')
-            )
+                'body' => new \core_external\external_value(PARAM_RAW, 'Json with data and errors')
+            ),
         );
     }
 }

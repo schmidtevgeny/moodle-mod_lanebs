@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.e
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * lanebs of interface functions and constants.
@@ -146,18 +146,13 @@ function lanebs_get_coursemodule_info($coursemodule) {
 function install_requirements()
 {
     global $DB, $PAGE;
-    $userEmail = 'lan@lanbook.com';
     $systemContext = context_system::instance();
     $PAGE->set_context($systemContext);
     $enabledprotocols = get_config('core', 'webserviceprotocols');
     if (stripos($enabledprotocols, 'rest') === false) {
         set_config('webserviceprotocols', $enabledprotocols . ',rest');
     }
-    if (function_exists('core_user::get_user_by_email')) {
-        $webserviceUser = core_user::get_user_by_email($userEmail);
-    } else {
-        $webserviceUser = $DB->get_record('user', array('email' => $userEmail));
-    }
+    $webserviceUser = core_user::get_user_by_email('lan@lanbook.com');
     if (!$webserviceUser) {
         $user = array(
             'username' => 'ws-lanebs-constructor',
@@ -165,10 +160,6 @@ function install_requirements()
             'lastname' => 'User',
             'email' => 'lan@lanbook.com',
             'createpassword' => true,
-            'firstnamephonetic' => 'Lan',
-            'lastnamephonetic' => 'Service',
-            'middlename' => 'Service',
-            'alternatename' => '',
         );
         $webserviceUser = (object)core_user_external::create_users(array($user))[0];
     }
@@ -215,14 +206,9 @@ function install_requirements()
 function install_permissions()
 {
     global $DB, $PAGE;
-    $userEmail = 'lan@lanbook.com';
     $systemContext = context_system::instance();
     $PAGE->set_context($systemContext);
-    if (function_exists('core_user::get_user_by_email')) {
-        $webserviceUser = core_user::get_user_by_email($userEmail);
-    } else {
-        $webserviceUser = $DB->get_record('user', array('email' => $userEmail));
-    }
+    $webserviceUser = core_user::get_user_by_email('lan@lanbook.com');
     if (!has_capability('moodle/question:useall', $systemContext, $webserviceUser)) {
         $wsName = 'ws-lanconstructor-role';
         $wsroleId = $DB->get_record('role', array('shortname' => $wsName));
@@ -279,8 +265,8 @@ function getQuiz($course, $quizData, $quizmodule, $section)
     $quiz->questiondecimalpoints = -1;
     $quiz->visible = 1;
     $quiz->visibleoncoursepage = 1;
-    $quiz->sumgrades = $quizData['qCount'];
-    $quiz->grade = round(($quizData['qCount']*70)/100);
+    $quiz->sumgrade =  $quizData['qCount'];
+    $quiz->grade =  $quizData['qCount'];
     $quiz->intro = $quizData['description'];
     $quiz->quizpassword = '';
     $quiz->section = $section;

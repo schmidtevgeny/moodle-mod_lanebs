@@ -51,9 +51,9 @@ class mod_lanebs_mod_form extends moodleform_mod {
         else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
             $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
         }
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_video.css');
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_book.css');
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/lanebs_modal.css');
+        $PAGE->requires->css('/mod/lanebs/css/modal_video.css');
+        $PAGE->requires->css('/mod/lanebs/css/modal_book.css');
+        $PAGE->requires->css('/mod/lanebs/css/lanebs_modal.css');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
         $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init', array('base_url' => $baseUrl));
