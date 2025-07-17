@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once(__DIR__.'/lib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once(__DIR__ . '/lib.php');
 
 /**
  * Module instance settings form.
@@ -34,9 +34,11 @@ require_once(__DIR__.'/lib.php');
  * @copyright  2020 Senin Yurii <katorsi@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lanebs_mod_form extends moodleform_mod {
+class mod_lanebs_mod_form extends moodleform_mod
+{
 
-    public function definition() {
+    public function definition()
+    {
         global $CFG, $PAGE, $USER;
 
         // Course_module ID
@@ -47,22 +49,30 @@ class mod_lanebs_mod_form extends moodleform_mod {
         $baseUrl = get_lanebs_config('base_url');
         if (isset($settings->token) && !empty($settings->token)) {
             $_SESSION['mod_lanebs_subscriberToken'] = $settings->token;
-        }
-        else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
+        } else if (isset($USER->profile['mod_lanebs_token']) && !empty($USER->profile['mod_lanebs_token'])) {
             $_SESSION['mod_lanebs_subscriberToken'] = $USER->profile['mod_lanebs_token'];
         }
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_video.css');
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/modal_book.css');
-        $PAGE->requires->css($CFG->dirroot . '/mod/lanebs/css/lanebs_modal.css');
-        $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
-        $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
-        $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init', array('base_url' => $baseUrl));
+        $PAGE->requires->css(new moodle_url('/mod/lanebs/css/modal_video.css'));
+        $PAGE->requires->css(new moodle_url('/mod/lanebs/css/modal_book.css'));
+        $PAGE->requires->css(new moodle_url('/mod/lanebs/css/lanebs_modal.css'));
+        if ($CFG->branch > 37) {
+            $PAGE->requires->js_call_amd('mod_lanebs/modal_search_handle', 'init');
+            $PAGE->requires->js_call_amd('mod_lanebs/modal_video_handle', 'init');
+            $PAGE->requires->js_call_amd('mod_lanebs/modal_constructor_handle', 'init', array('base_url' => $baseUrl));
+            $PAGE->requires->js_call_amd('mod_lanebs/copy_paste', 'init');
+        } else {
+            $PAGE->requires->js_call_amd('mod_lanebs/m37_modal_search_handle', 'init');
+            $PAGE->requires->js_call_amd('mod_lanebs/m37_modal_video_handle', 'init');
+            $PAGE->requires->js_call_amd('mod_lanebs/m37_modal_constructor_handle', 'init', array('base_url' => $baseUrl));
+            $PAGE->requires->js_call_amd('mod_lanebs/m37_copy_paste', 'init');
+        }
+
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('lanebsname', 'mod_lanebs'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('lanebsname', 'mod_lanebs'), array('size' => '64', 'placeholder' => get_string('placeholder','mod_lanebs')));
 
         $mform->addElement('hidden', 'content', '');
         $mform->setType('content', PARAM_TEXT);
@@ -87,7 +97,9 @@ class mod_lanebs_mod_form extends moodleform_mod {
         $courseid = optional_param('course', 0, PARAM_INT);
         $section = optional_param('section', 0, PARAM_INT);
         if ($courseid !== 0) {
-            $mform->addElement('button', 'lan_constructor_button', get_string('lan_constructor', 'mod_lanebs'), array('id' => 'lan_constructor_button', 'data-courseid' => $courseid, 'data-token' => '', 'data-section' => $section, 'data-service' => ''));
+            $mform->addElement('button', 'lan_constructor_button', get_string('lan_constructor', 'mod_lanebs'),
+                array('style' => 'background-color:#3769f5;color:white;', 'id' => 'lan_constructor_button', 'data-courseid' => $courseid, 'data-token' => '', 'data-section' => $section, 'data-service' => '', 'data-mod-lanebs-version' => get_lanebs_config('release')));
+
         }
 
         //$mform->addElement('button', 'modal_show_button', get_string('button_desc', 'mod_lanebs'));
@@ -96,7 +108,9 @@ class mod_lanebs_mod_form extends moodleform_mod {
         //$mform->addElement('button', 'modal_video_button', get_string('video_button_desc', 'mod_lanebs'), array('data-action' => 'video_modal', 'class' => 'hidden'));
         //$mform->addElement('html', '<div class="video_preview_container row"></div>');
 
-        $mform->addElement('text', 'content_name', get_string('choosen_resourse', 'mod_lanebs'), ['style' => 'width:100%']);
+        $mform->addElement('text', 'content_name', get_string('choosen_resourse', 'mod_lanebs'),
+            array('style' => 'width:100%', 'value' => get_string('placeholder','mod_lanebs')));
+
         $mform->addRule('content_name', null, 'required', null, 'client');
         $mform->setType('content_name', PARAM_TEXT);
 
@@ -114,7 +128,11 @@ class mod_lanebs_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'videos', get_string('video', 'mod_lanebs'));
         $mform->setType('videos', PARAM_TEXT);
 
-        $mform->addElement('html', '<div class="mod_lanebs_version">v'.get_lanebs_config('release').'</div>');
+        $mform->addElement('html', '<div class="mod_lanebs_version">v' . get_lanebs_config('release') . '</div>');
+        $url = 'https://vk.com/video-177041626_456239072';
+        $label = \html_writer::tag('b', get_string('lanebs_link_info', 'mod_lanebs'));
+        $link = \html_writer::link($url, $url, ['target' => '_blank']);
+        $mform->addElement('html', \html_writer::div($label.$link, 'mod_lanebs_link'));
 
         $mform->addElement('header', 'copy-paste_mod', get_string('copy_paste', 'mod_lanebs'));
         if ($id) {
@@ -122,7 +140,6 @@ class mod_lanebs_mod_form extends moodleform_mod {
         }
         $mform->addElement('button', 'paste_mod', get_string('paste_settings', 'mod_lanebs'));
 
-        $PAGE->requires->js_call_amd('mod_lanebs/copy_paste', 'init');
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
@@ -132,7 +149,8 @@ class mod_lanebs_mod_form extends moodleform_mod {
     }
 
 
-    public function validation($data, $files) {
+    public function validation($data, $files)
+    {
         return parent::validation($data, $files);
     }
 }

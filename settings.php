@@ -24,7 +24,26 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
 require_once __DIR__ . '/lib.php';
+
+/**
+ * @var admin_root $ADMIN
+ * @var admin_settingpage $settings
+ * @var string $section -- modsettinglanebs
+ */
+
+$ADMIN->add(
+    'modsettings',
+    new admin_category('modlanebsfolder', new lang_string('pluginname', 'mod_lanebs'))
+);
+
+
+$settings = new admin_settingpage(
+    $section,
+    get_string('connection_parameters', 'mod_lanebs'),
+    'moodle/site:config'
+);
 
 if ($ADMIN->fulltree) {
     global $PAGE;
@@ -41,4 +60,29 @@ if ($ADMIN->fulltree) {
         );
         send_stat($data);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    $url = new moodle_url('/mod/lanebs/health_check.php');
+    $link = html_writer::link(
+        $url,
+        get_string('checking_plugin', 'mod_lanebs'),
+        [
+            'class' => 'btn btn-secondary',
+            'target' => '_blank'
+        ]
+    );
+    $html = html_writer::div($link, 'col text-center');
+    $settings->add(new admin_setting_heading('lanebs/heath_check', $html, ''));
+    // -----------------------------------------------------------------------------------------------------------------
 }
+$ADMIN->add('modlanebsfolder', $settings);
+
+$settings = null;
+
+$page = new admin_externalpage(
+    'mod_lanebs_health_check',
+    get_string('checking_plugin', 'mod_lanebs'),
+    new moodle_url('/mod/lanebs/health_check.php')
+);
+
+$ADMIN->add('modlanebsfolder', $page);

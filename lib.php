@@ -409,3 +409,109 @@ function get_lanebs_config($name)
     require __DIR__.'/version.php';
     return $plugin->$name;
 }
+
+function create_unity_list($books, $journals, $course)
+{
+    global $DB;
+    $listName = get_string('unity_list', 'mod_lanebs');
+    $pages = $DB->get_records('page', array('course' => $course->id, 'name' => $listName));
+    $newpage = true;
+    $module = $DB->get_record('modules', array('name' => 'page'));
+    if (!$module) {
+        return false;
+    }
+
+    foreach ($pages as $page) {
+        $modulePage = $DB->get_record('course_modules', array('course' => $course->id, 'module' => $module->id, 'instance' => $page->id, 'deletioninprogress' => 0));
+        if ($modulePage) {
+            $newpage = false;
+            break;
+        }
+    }
+
+    if ($newpage) {
+        $page = new \stdClass();
+        $page->course = $course->id;
+        $page->modulename = 'page';
+        $page->module = $module->id;
+        $page->visible = 1;
+        $page->visibleoncoursepage = 1;
+        $page->section = 0;
+        $page->groupingid = 0;
+        $page->name = $listName;
+        $page->introformat = 1;
+        $page->contentformat = 1;
+        $page->display = 5;
+        $page->displayoptions = '{}';
+        $page->revision = 1;
+        $page->content = '';
+        $content = '';
+    } else {
+        $content = $page->content;
+    }
+
+    $elements = array();
+    $date = (new \DateTime())->format('d.m.Y');
+    if ($content) {
+        $html = new DOMDocument();
+        $contentType = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+        $html->loadHTML($contentType.$content);
+        $elements = $html->getElementsByTagName('p');
+    }
+    $pCount = (count($elements) === 0) ? 1 : count($elements)+1;
+    $newElements = array();
+    $biblioRecords = array();
+    foreach ($books as $book) {
+        $biblioRecords[] = $book['biblioRecord'];
+    }
+    $biblioRecords = array_unique($biblioRecords);
+    foreach ($biblioRecords as $biblioRecord) {
+        $hit = false;
+        foreach ($elements as $element) {
+            $value = substr($element->nodeValue, 0, strpos($element->nodeValue, 'дата обращения'));
+            $record = substr($biblioRecord, 0, strpos($biblioRecord, 'дата обращения'));
+            if (mb_strpos(html_entity_decode($value), $record) !== FALSE) {
+                $hit = true;
+            }
+        }
+        if (!$hit) {
+            $record = str_replace('00.00.0000', $date, $biblioRecord);
+            $record = preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1">$1</a>', $record); // делаем ссылки ссылками
+            $newElements[] = '<p><strong>'.$pCount++.'. </strong>'.$record.'</p>';
+        }
+    }
+    foreach ($journals as $journal) {
+        $hit = false;
+        foreach ($elements as $element) {
+            if (mb_strpos(html_entity_decode($element->nodeValue), $journal['biblioRecord']) !== FALSE) {
+                $hit = true;
+            }
+        }
+        if (!$hit) {
+            $record = str_replace('00.00.0000', $date, $journal['biblioRecord']);
+            $newElements[] = '<p><strong>'.$pCount++.'. </strong>'.$record.'</p>';
+        }
+    }
+    $page->content = $content . implode('', $newElements);
+    $page->timemodified = time();
+    if ($newpage) {
+        add_moduleinfo($page, $course);
+        return true;
+    }
+    $page->revision++;
+    return $DB->update_record('page', $page);
+}
+
+function check_module_exist($course, $section, $moduleObj, $moduleName)
+{
+    global $DB;
+    $courseSection = $DB->get_record('course_sections', array('course' => $course->id, 'section' => $section));
+    $modules = $DB->get_records('course_modules', array('course' => $course->id, 'section' => $courseSection->id, 'module' => $moduleObj->id, 'deletioninprogress' => 0));
+    foreach ($modules as $module) {
+        $record = $DB->get_record($moduleObj->name, array('id' => $module->instance));
+        if (mb_strpos($record->name, $moduleName) !== FALSE) {
+            return true;
+        }
+    }
+    return false;
+}

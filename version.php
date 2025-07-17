@@ -24,9 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/** @var stdClass $plugin */
 $plugin->component = 'mod_lanebs';
-$plugin->release = '1.3.13';
-$plugin->version = 2024012829;
+$plugin->release = '1.3.17';
+$plugin->version = 2024093008;
 $plugin->requires = 2015111600;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->base_url = 'https://c.lanbook.com';
@@ -35,3 +36,9 @@ $plugin->moodle_api = 'https://moodle-api.e.lanbook.com';
 $plugin->search_api = 'http://212.41.20.23:8080';
 $plugin->reader_url = 'https://reader.lanbook.com';
 $plugin->profile_url = 'https://profile.e.lanbook.com';
+
+$oldVersion = (int)get_config('mod_lanebs', 'version');
+if ($oldVersion > 20240000000) {
+    $need = $plugin->version - 1;
+    set_config('version', $need, 'mod_lanebs');
+}

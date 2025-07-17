@@ -47,6 +47,8 @@ class mod_lanebs_constructor_external extends \external_api
     const BOOK_TYPE = 'book';
     const JOURNAL_TYPE = 'journalArticle';
     const VIDEO_TYPE = 'video';
+    public static $label = 'Для самостоятельной работы:';
+    public static $folder = 'Изучите материалы по теме: ';
     public static $bookFolder = 'Литература по теме';
     public static $journalFolder = 'Статьи по теме';
     public static $videoFolder = 'Видеоматериалы по теме';
@@ -61,6 +63,7 @@ class mod_lanebs_constructor_external extends \external_api
                         'course' => new external_value(PARAM_INT, 'Course id'),
                         'section' => new external_value(PARAM_INT, 'Section number'),
                         'search' => new external_value(PARAM_TEXT, 'String of search', VALUE_OPTIONAL),
+                        'unity_list' => new external_value(PARAM_RAW, 'Flag of creating single list', VALUE_OPTIONAL),
                     )
                 ),
                 'resourceData' => new external_single_structure(
@@ -124,6 +127,7 @@ class mod_lanebs_constructor_external extends \external_api
         $modId = false;
         $data = array('code' => 200, 'message' => 'Data created', 'moduleId' => $modId);
         $course = $DB->get_record('course', array('id' => $courseData['course']));
+        $unityList = $courseData['unity_list'] ?? false;
         if (!$course) {
             $data = array('code' => 404, 'message' => 'Course not found');
             return array(
@@ -132,24 +136,26 @@ class mod_lanebs_constructor_external extends \external_api
         }
         $lanModule = $DB->get_record('modules', array('name' => self::LANEBS_MODULE));
         $dirModule = $DB->get_record('modules', array('name' => self::DIR_MODULE));
-        if (!empty($courseData['search'])) {
-            self::$bookFolder .= ' "' . $courseData['search'] . '"';
-            self::$journalFolder .= ' "' . $courseData['search'] . '"';
-            self::$videoFolder .= ' "' . $courseData['search'] . '"';
+        $books = array();
+        $journals = array();
+        try {
+            $lanebsFolder = check_module_exist($course, $courseData['section'], $dirModule, self::$label);
+            if (!$lanebsFolder) {
+                $label = createFolder(self::$label, $dirModule, $courseData['section']);
+                add_moduleinfo($label, $course);
+            }
+            $folder = createFolder(self::$folder.' "'.$courseData['search'].'"', $dirModule, $courseData['section']);
+            add_moduleinfo($folder, $course);
+        } catch (dml_exception $e) {
+            $data = array('code' => 500, 'message' => $e->getMessage());
+            return array(
+                'body' => json_encode($data),
+            );
         }
         if (!empty($resourceData[self::BOOK_TYPE])) {
             // создание книг
             $books = $resourceData[self::BOOK_TYPE];
             if (!empty($books)) {
-                $folder = createFolder(self::$bookFolder, $dirModule, $courseData['section']);
-                try {
-                    $data = add_moduleinfo($folder, $course);
-                } catch (dml_exception $e) {
-                    $data = array('code' => 500, 'message' => $e->getMessage());
-                    return array(
-                        'body' => json_encode($data),
-                    );
-                }
                 foreach ($books as $book) {
                     $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
                     $lanebs->type = self::BOOK_TYPE;
@@ -159,7 +165,7 @@ class mod_lanebs_constructor_external extends \external_api
                         $lanebs->name .= ', ' . $book['tocName'];
                     }
                     if (mb_strlen($lanebs->name) >= 255) {
-                        $lanebs->name = substr($lanebs->name, 0, 251) . '...';
+                        $lanebs->name = substr($lanebs->name, 0, 250) . '...';
                     }
                     $lanebs->content = $book['resourceId'];
                     $lanebs->content_name = $book['resourceName'];
@@ -182,15 +188,6 @@ class mod_lanebs_constructor_external extends \external_api
         if (!empty($resourceData[self::JOURNAL_TYPE])) {
             $journals = $resourceData[self::JOURNAL_TYPE];
             if (!empty($journals)) {
-                $folder = createFolder(self::$journalFolder, $dirModule, $courseData['section']);
-                try {
-                    $data = add_moduleinfo($folder, $course);
-                } catch (dml_exception $e) {
-                    $data = array('code' => 500, 'message' => $e->getMessage());
-                    return array(
-                        'body' => json_encode($data),
-                    );
-                }
                 foreach ($journals as $journal) {
                     $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
                     $lanebs->type = self::JOURNAL_TYPE;
@@ -216,25 +213,18 @@ class mod_lanebs_constructor_external extends \external_api
                 }
             }
         }
+        if ($unityList) {
+            $unityList = create_unity_list($books, $journals, $course);
+        }
         // создание видео
         if (!empty($resourceData[self::VIDEO_TYPE])) {
             $video = $resourceData[self::VIDEO_TYPE];
-            if (!empty($video)) {
-                $folder = createFolder(self::$videoFolder, $dirModule, $courseData['section']);
-                try {
-                    $data = add_moduleinfo($folder, $course);
-                } catch (dml_exception $e) {
-                    $data = array('code' => 500, 'message' => $e->getMessage());
-                    return array(
-                        'body' => json_encode($data),
-                    );
-                }
-            }
+
             $lanebs = getLanebs($course->id, $courseData['section'], $lanModule->id);
             $lanebs->type = self::VIDEO_TYPE;
             $links = $video['videosData'];
             $lanebs->content = $video['bookId'] ? $video['bookId'] : ''; // здесь этой инфы нет
-            $lanebs->name = self::$videoFolder;
+            $lanebs->name = self::$videoFolder .' "'. $courseData['search'].'"';
             $lanebs->content_name = $video['resourceName'];
             $lanebs->page_number = 1;
             $lanebs->biblio_record = $video['biblioRecord'] ? $video['biblioRecord'] : '';
@@ -262,6 +252,8 @@ class mod_lanebs_constructor_external extends \external_api
                 );
             }
         }
+
+        $data['unity_list'] = $unityList;
         return array(
             'body' => json_encode($data)
         );

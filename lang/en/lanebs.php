@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['ru'] = '';
 $string['pluginname'] = 'Integration with ELS Lan';
 $string['modulename'] = 'Integration with ELS Lan';
-$string['modulename_help'] = 'The plugin allows you to seamlessly integrate educational content from EBS Lan (links to textbook pages, videos) into electronic courses. Using the Plugin optimizes the time for developing electronic courses, expands the teacher’s capabilities, involves students in studying the material, and thereby increases the efficiency of learning in the electronic educational environment.';
+$string['modulename_help'] = 'Плагин позволяет добавить в курс контент из ЭБС Лань: главы и параграфы учебников, статьи из научных журналов, образовательные видеоролики. Видеоинструкция по работе с ЭУК-конструктором здесь: <a href="https://vk.com/video-177041626_456239072" target="_blank">https://vk.com/video-177041626_456239072</a>';
 $string['lanebsname'] = 'Resource name';
 $string['lanebsname_help'] = 'Enter the name of the library';
 $string['button_desc'] = 'Check resource';
@@ -99,6 +99,14 @@ $string['paste_settings'] = 'Paste settings';
 $string['plugin_title'] = 'Library Integration';
 $string['subscriber_token'] = 'Subscriber token';
 $string['token_desc'] = 'Subscriber token for reader access';
-$string['lan_constructor'] = 'Lan Constructor';
+$string['lan_constructor'] = 'Go to materials selection';
 $string['privacy:metadata'] = 'The LANEBS module does not store any personal data';
 $string['lanebs_role'] = 'WS Role for Lan Constructor';
+$string['lanebs_link_info'] = 'Video instructions for working with the Constructor: ';
+
+$string['connection_parameters'] = 'Connection parameters';
+$string['checking_plugin'] = 'Checking the plugin';
+$string['instruction'] = 'Instruction';
+
+$string['unity_list'] = 'Single list of sources';
+$string['placeholder'] = 'will be filled in automatically';
